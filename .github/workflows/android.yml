@@ -5,6 +5,8 @@ on:
   push:
     branches: [main]
     paths: [www/**, package.json, capacitor.config.json, admob.json, assets/**, scripts/**, .github/workflows/**]
+permissions:
+  contents: write
 jobs:
   compilar:
     runs-on: ubuntu-latest
@@ -14,7 +16,6 @@ jobs:
         with: { node-version: 22 }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 21 }
-      - uses: android-actions/setup-android@v3
       - name: Instalar dependencias
         run: npm install --no-audit --no-fund
       - name: Crear y configurar proyecto Android
@@ -48,3 +49,11 @@ jobs:
         with:
           name: pyme-en-regla-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
+      - name: Publicar el .aab en la rama "aab"
+        run: |
+          mkdir /tmp/out && cp android/app/build/outputs/bundle/release/app-release.aab /tmp/out/pyme-en-regla-${{ github.run_number }}.aab
+          cd /tmp/out
+          git init -q -b aab
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git add . && git commit -q -m "AAB build ${{ github.run_number }}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" aab
