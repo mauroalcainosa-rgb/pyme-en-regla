@@ -1,0 +1,23 @@
+{
+  "name": "pyme-en-regla",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pyme en Regla: diagnóstico y seguimiento del cumplimiento de la Ley 21.719 para pymes. Creada por Mauroblues.",
+  "scripts": {
+    "android:preparar": "npx cap add android && npx capacitor-assets generate --android && node scripts/configurar-android.mjs && npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.2",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/browser": "^8.0.5",
+    "@capacitor/core": "8.6.2",
+    "@capacitor/filesystem": "8.1.5",
+    "@capacitor/share": "8.0.3",
+    "@capacitor/splash-screen": "8.0.2",
+    "@capacitor-community/admob": "8.3.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^4.0.0",
+    "@capacitor/cli": "8.6.2"
+  }
+}

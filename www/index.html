@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#12355b">
+<title>Pyme en Regla</title>
+<style>
+/* Layout: app estilo iOS — barra de navegación con título grande, listas agrupadas, hojas (sheets) inferiores y barra de pestañas fija abajo */
+:root{
+  --bg:#f2f2f7; --cell:#ffffff; --ink:#000000; --muted:#6e6e73; --sep:#d1d1d6; --fill:#e9e9ee;
+  --blue:#007aff; --green:#34c759; --orange:#ff9500; --red:#ff3b30; --indigo:#5856d6;
+  --green-soft:#e3f6e8; --orange-soft:#fff1dc; --red-soft:#ffe5e3; --blue-soft:#e1efff;
+  --bar:rgba(249,249,251,.88);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",system-ui,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#000000; --cell:#1c1c1e; --ink:#ffffff; --muted:#98989f; --sep:#38383a; --fill:#2c2c2e;
+  --blue:#0a84ff; --green:#30d158; --orange:#ff9f0a; --red:#ff453a; --indigo:#5e5ce6;
+  --green-soft:#12301b; --orange-soft:#3a2a0e; --red-soft:#3d1513; --blue-soft:#0f2742; --bar:rgba(22,22,24,.88); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#000000; --cell:#1c1c1e; --ink:#ffffff; --muted:#98989f; --sep:#38383a; --fill:#2c2c2e;
+  --blue:#0a84ff; --green:#30d158; --orange:#ff9f0a; --red:#ff453a; --indigo:#5e5ce6;
+  --green-soft:#12301b; --orange-soft:#3a2a0e; --red-soft:#3d1513; --blue-soft:#0f2742; --bar:rgba(22,22,24,.88); color-scheme:dark;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.35;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+p{margin:0}
+.navbar{position:sticky;top:0;z-index:10;background:var(--bar);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);padding:calc(env(safe-area-inset-top) + 8px) max(16px,env(safe-area-inset-right)) 8px max(16px,env(safe-area-inset-left));border-bottom:.5px solid var(--sep)}
+.navrow{max-width:720px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:32px}
+.navrow .store{font-size:13px;color:var(--muted)}
+.navbtns{display:flex;gap:10px;align-items:center}
+.iconbtn{border:0;background:none;color:var(--blue);font-size:17px;padding:4px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:600;border:0;cursor:pointer}
+.largetitle{max-width:720px;margin:0 auto;padding:4px 0 0}
+.largetitle h1{font-size:34px;font-weight:700;letter-spacing:.01em;margin:0;line-height:1.15}
+.largetitle .sub{color:var(--muted);font-size:15px}
+main{max-width:720px;margin:0 auto;padding:12px max(16px,env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));display:grid;gap:22px}
+.section{display:grid;gap:6px}
+.shead{font-size:13px;text-transform:uppercase;color:var(--muted);padding:0 16px;letter-spacing:.02em}
+.sfoot{font-size:13px;color:var(--muted);padding:0 16px}
+.group{background:var(--cell);border-radius:10px;overflow:hidden}
+.cell{display:flex;align-items:center;gap:12px;padding:11px 16px;min-height:44px;position:relative;width:100%;text-align:left;border:0;background:var(--cell)}
+.cell+.cell::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--sep)}
+.cell.icon+.cell.icon::before,.cell.icon+.cell::before{left:60px}
+button.cell{cursor:pointer}
+button.cell:active{background:var(--fill)}
+.cell .main{flex:1;min-width:0;display:grid;gap:2px}
+.cell .title{font-size:17px}
+.cell .subtitle{font-size:15px;color:var(--muted)}
+.cell .value{color:var(--muted);font-size:17px;text-align:right}
+.chev{color:var(--sep);font-size:22px;line-height:1;flex:none}
+.ico{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;color:#fff;flex:none}
+.ico svg{width:18px;height:18px}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.pill.ok{background:var(--green-soft);color:var(--green)} .pill.warn{background:var(--orange-soft);color:var(--orange)} .pill.bad{background:var(--red-soft);color:var(--red)} .pill.info{background:var(--blue-soft);color:var(--blue)}
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.info{border:0;background:none;color:var(--blue);cursor:pointer;padding:2px;flex:none;display:grid;place-items:center}
+.info svg{width:22px;height:22px}
+.seg{display:inline-flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
+.seg button{border:0;background:none;padding:6px 14px;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--cell);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.seg.wide{display:flex}.seg.wide button{flex:1}
+.hero{background:var(--cell);border-radius:14px;padding:16px;display:flex;gap:16px;align-items:center}
+.hero .main{flex:1;display:grid;gap:4px}
+.hero h2{margin:0;font-size:20px}
+.ring{flex:none}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--cell);border-radius:12px;padding:12px 14px;display:grid;gap:2px;border:0;text-align:left;cursor:pointer}
+.tile b{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums}
+.tile span{font-size:13px;color:var(--muted)}
+.tile .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+.q{padding:12px 16px;display:grid;gap:8px;position:relative}
+.q+.q::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--sep)}
+.q .qt{display:flex;gap:8px;align-items:flex-start}
+.q .qt p{flex:1}
+.q .qa{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.q .rec{font-size:14px;color:var(--muted)}
+.btn{border:0;background:var(--blue);color:#fff;font-size:17px;font-weight:600;padding:13px 18px;border-radius:12px;cursor:pointer;width:100%}
+.btn.tinted{background:var(--blue-soft);color:var(--blue)}
+.btn.plain{background:none;color:var(--blue);padding:8px}
+.btn.destructive{background:none;color:var(--red)}
+.btn:disabled{opacity:.5}
+.banner{background:var(--orange-soft);border-radius:12px;padding:12px 14px;display:grid;gap:10px;font-size:15px}
+.doc{white-space:pre-wrap;font-size:14px;padding:14px 16px;max-height:420px;overflow:auto}
+.empty{color:var(--muted);text-align:center;padding:22px 16px;font-size:15px}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--bar);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--sep);padding:6px max(8px,env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+.tabbar .in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.tabbar button{border:0;background:none;display:grid;justify-items:center;gap:2px;font-size:10px;font-weight:500;color:var(--muted);cursor:pointer;padding:2px 0}
+.tabbar button svg{width:26px;height:26px}
+.tabbar button[aria-current="page"]{color:var(--blue)}
+/* hoja inferior */
+dialog.sheet{border:0;padding:0;margin:auto auto 0;width:100%;max-width:720px;max-height:92%;border-radius:14px 14px 0 0;background:var(--bg);color:var(--ink);overflow:auto}
+dialog.sheet::backdrop{background:rgba(0,0,0,.4)}
+@media (min-width:760px){dialog.sheet{margin:auto;border-radius:14px;max-height:86%}}
+.sheethead{position:sticky;top:0;background:var(--bg);z-index:2;padding:8px 16px 10px;display:grid;gap:6px}
+.grabber{width:36px;height:5px;border-radius:3px;background:var(--sep);margin:0 auto}
+.sheetbar{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sheetbar h2{font-size:17px;font-weight:600;margin:0;text-align:center;flex:1}
+.sheetbar button{min-width:80px}
+.sheetbar button:last-child{text-align:right;font-weight:600}
+.sheetbody{padding:4px 16px calc(24px + env(safe-area-inset-bottom));display:grid;gap:22px}
+.field{display:flex;align-items:center;gap:10px;padding:8px 16px;min-height:44px;position:relative}
+.field+.field::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--sep)}
+.field label{flex:0 0 40%;font-size:16px}
+.field.stack{flex-wrap:wrap}.field.stack label{flex:1 1 100%}
+.field input,.field select,.field textarea{flex:1;min-width:0;border:0;background:none;color:var(--ink);font:inherit;font-size:16px;text-align:right;padding:4px 0}
+.field textarea{text-align:left;min-height:70px;resize:vertical;flex:1 1 100%}
+.field select{appearance:none;-webkit-appearance:none;text-align:right;text-align-last:right;color:var(--muted);cursor:pointer}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none}
+.field:focus-within{background:var(--fill)}
+button:focus-visible,.tile:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.refart{font-size:13px;font-weight:600;color:var(--blue)}
+.reftext{font-size:16px}
+.check{color:var(--blue);font-weight:600}
+a{color:var(--blue)}
+.small{font-size:13px;color:var(--muted)}
+table.rep{width:100%;border-collapse:collapse;font-size:14px}
+table.rep th,table.rep td{text-align:left;padding:8px 10px;border-bottom:.5px solid var(--sep);vertical-align:top}
+table.rep th{font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:600}
+.scrollx{overflow-x:auto}
+.toast{position:fixed;left:16px;right:16px;bottom:calc(90px + env(safe-area-inset-bottom));z-index:30;max-width:420px;margin:auto;background:rgba(40,40,44,.94);color:#fff;border-radius:12px;padding:12px 16px;font-size:15px;text-align:center}
+.hidden{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* encuesta */
+.progress{height:4px;background:var(--fill);border-radius:2px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--blue);border-radius:2px;transition:width .25s}
+.qhead{display:grid;gap:8px}
+.qmeta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.02em}
+.qtitle{display:flex;gap:8px;align-items:flex-start}
+.qtitle h2{flex:1;margin:0;font-size:22px;line-height:1.25;font-weight:700}
+.opt{display:flex;align-items:center;gap:12px;padding:13px 16px;min-height:52px;position:relative;width:100%;text-align:left;border:0;background:var(--cell);cursor:pointer;font-size:17px}
+.opt+.opt::before{content:"";position:absolute;top:0;left:52px;right:0;border-top:.5px solid var(--sep)}
+.opt:active{background:var(--fill)}
+.mark{width:24px;height:24px;border-radius:50%;border:2px solid var(--sep);flex:none;display:grid;place-items:center;color:#fff;font-size:14px;font-weight:700}
+.mark.sq{border-radius:6px}
+.opt[aria-checked="true"] .mark{background:var(--blue);border-color:var(--blue)}
+.navq{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.intro{background:var(--cell);border-radius:14px;padding:20px;display:grid;gap:12px;text-align:center;justify-items:center}
+.intro .big{width:64px;height:64px;border-radius:16px;background:var(--blue);display:grid;place-items:center}
+.intro .big svg{width:36px;height:36px}
+.intro h2{margin:0;font-size:24px}
+.measure{display:flex;gap:12px;padding:12px 16px;position:relative;align-items:flex-start}
+.measure+.measure::before{content:"";position:absolute;top:0;left:52px;right:0;border-top:.5px solid var(--sep)}
+.measure .main{flex:1;display:grid;gap:4px}
+.measure .main b{font-weight:600}
+.measure.done .main b{text-decoration:line-through;color:var(--muted)}
+.chk{border:0;background:none;padding:0;cursor:pointer;flex:none;margin-top:1px}
+.badge{position:absolute;top:0;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;line-height:1}
+.tile .dot,.cell .dot{display:inline-block}
+/* ===== Identidad Datos en Regla: azul marino institucional + verde "en regla" ===== */
+:root{
+  --brand:#12355b; --brand2:#12a37a; --blue:#1d5fb8; --blue-soft:#e4eefa;
+  --green:#1f9d57; --orange:#d97f06; --red:#d63a2c; --indigo:#12355b;
+  --green-soft:#e2f4ea; --orange-soft:#fcf0dc; --red-soft:#fbe6e3;
+  --bg:#f3f5f8;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --brand:#9cc0ea; --brand2:#3fd1a2; --blue:#6aa6ee; --blue-soft:#132a45;
+  --green:#41c87e; --orange:#f2a53a; --red:#f2786b; --indigo:#9cc0ea; --bg:#000;
+  --green-soft:#12301f; --orange-soft:#3a2a0f; --red-soft:#3d1a16;}}
+:root[data-theme="dark"]{
+  --brand:#9cc0ea; --brand2:#3fd1a2; --blue:#6aa6ee; --blue-soft:#132a45;
+  --green:#41c87e; --orange:#f2a53a; --red:#f2786b; --indigo:#9cc0ea; --bg:#000;
+  --green-soft:#12301f; --orange-soft:#3a2a0f; --red-soft:#3d1a16;}
+.brandrow{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;letter-spacing:-.01em;color:var(--brand)}
+.brandrow svg{width:26px;height:26px;flex:none}
+.brandrow .en{color:var(--brand2)}
+.avatar{background:var(--brand)}
+.hero-brand{background:linear-gradient(160deg,#12355b 0%,#0f2b4a 70%,#0d3f52 100%);color:#fff;border-radius:18px;padding:26px 20px 22px;display:grid;gap:14px;justify-items:center;text-align:center}
+.hero-brand svg.logo{width:84px;height:84px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.25))}
+.hero-brand .wm{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1}
+.hero-brand .wm span{color:#3fd1a2}
+.hero-brand .tag{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#b9cbe0}
+.hero-brand h2{font-size:21px;margin:4px 0 0;font-weight:700}
+.hero-brand p{font-size:15px;color:#d8e3f0;max-width:34em}
+.hero-brand .btn{background:#3fd1a2;color:#06281f}
+.trust{display:grid;gap:0}
+.trust .cell .ico{background:var(--brand)}
+.bar{flex:1;height:8px;border-radius:4px;background:var(--fill);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;border-radius:4px}
+.areaRow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(70px,1fr) 44px;align-items:center;gap:12px;padding:11px 16px;position:relative}
+.areaRow+.areaRow::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--sep)}
+.areaRow b{font-variant-numeric:tabular-nums;text-align:right;font-size:15px}
+.areaRow span{font-size:15px}
+.ico{background:var(--brand)!important}
+.foot-brand{display:flex;justify-content:center;align-items:center;gap:6px;color:var(--muted);font-size:12px;padding:4px 0 8px}
+.foot-brand svg{width:16px;height:16px}
+.cell svg.about{width:30px;height:30px;flex:none}
+/* contraste en modo oscuro: rellenos de marca siempre oscuros con texto blanco */
+:root{--brandfill:#12355b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--brandfill:#2b5f96}}
+:root[data-theme="dark"]{--brandfill:#2b5f96}
+.avatar{background:var(--brandfill)!important;color:#fff}
+.ico{background:var(--brandfill)!important}
+.trust .cell .ico{background:var(--brandfill)!important}
+
+body.has-banner main{padding-bottom:calc(160px + env(safe-area-inset-bottom))}
+html,body{overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+input,textarea,.doc{-webkit-user-select:text;user-select:text}
+</style>
+<script src="lib/jspdf.umd.min.js"></script>
+<script src="lib/jspdf.plugin.autotable.min.js"></script>
+<script src="ads-config.js"></script>
+</head>
+<body>
+<div class="navbar">
+  <div class="navrow"><div class="brandrow" id="brandrow"></div><div class="navbtns" id="navbtns"></div></div>
+  <div class="largetitle"><h1 id="ltitle">Encuesta</h1><div class="sub" id="lsub"></div></div>
+</div>
+<main id="main"></main>
+<nav class="tabbar" aria-label="Secciones"><div class="in" id="tabbar" style="grid-template-columns:repeat(5,1fr)"></div></nav>
+<input type="file" id="impfile" accept="application/json,.json" class="hidden">
+<dialog class="sheet" id="sheet"><form id="sheetForm" method="dialog"></form></dialog>
+
+<script>
+"use strict";
+// ================== Ley ==================
+const VIGENCIA=new Date(2026,11,1), PLAZO=30;
+const LEY="Ley 19.628, modificada por la Ley 21.719";
+const LEYCHILE="https://www.bcn.cl/leychile/navegar?idNorma=141599";
+const DERECHOS=["Acceso","Rectificación","Supresión","Oposición","Portabilidad","Bloqueo"];
+
+const REF={
+  gobierno:{art:"Arts. 3 y 14 (responsabilidad del responsable)",t:"El responsable debe cumplir los principios de la ley y poder demostrarlo (principio de responsabilidad). En la práctica, alguien debe estar a cargo. La ley permite además, de forma voluntaria, adoptar un modelo de prevención de infracciones con un delegado de protección de datos."},
+  responsable:{art:"Art. 2 (definiciones)",t:"El responsable es la persona natural o jurídica que decide los fines y medios del tratamiento. En una pyme, normalmente es la propia empresa."},
+  rol:{art:"Art. 2",t:"La ley distingue al responsable (la empresa) del encargado (quien trata datos por cuenta de ella, como un contador externo)."},
+  canal:{art:"Arts. 11 y 14 ter",t:"La empresa debe informar cómo ejercer los derechos y mantener un medio accesible para recibir solicitudes, como un correo de privacidad."},
+  titulares:{art:"Art. 2 (titular de datos)",t:"El titular es la persona natural a quien se refieren los datos: clientes, trabajadores, postulantes, proveedores personas naturales o visitas."},
+  sensibles:{art:"Art. 2 letra g) y art. 16",t:"Son datos sensibles, entre otros, los de salud, biométricos (huella, rostro), origen étnico, afiliación política o sindical, creencias, vida sexual y orientación sexual. Solo pueden tratarse con consentimiento expreso o en los casos que la ley autoriza, y exigen más seguridad."},
+  datos:{art:"Art. 3 (principio de proporcionalidad)",t:"Solo se deben recopilar los datos necesarios, adecuados y pertinentes para la finalidad."},
+  finalidad:{art:"Art. 3 (principio de finalidad)",t:"Los datos deben recopilarse para fines específicos, explícitos y lícitos, y no pueden usarse después para fines incompatibles."},
+  base:{art:"Arts. 12 y 13 (fuentes de licitud)",t:"Todo tratamiento necesita una base legal: consentimiento del titular (art. 12) u otra fuente que la ley reconoce, como la ejecución de un contrato, el cumplimiento de una obligación legal o el interés legítimo del responsable (art. 13). El consentimiento debe ser libre, informado, específico e inequívoco."},
+  conservacion:{art:"Art. 3 (principio de proporcionalidad)",t:"Los datos solo pueden conservarse por el tiempo necesario para la finalidad. Después deben eliminarse o anonimizarse, salvo que otra ley exija guardarlos (plazos tributarios o laborales)."},
+  acceso:{art:"Arts. 14 bis y 15 bis",t:"Quienes acceden a los datos deben guardar secreto (art. 14 bis). Si un tercero los trata por cuenta de la empresa, es un encargado y debe existir un contrato con sus obligaciones (art. 15 bis)."},
+  extranjero:{art:"Arts. 27 y 28 (transferencia internacional)",t:"Alojar o enviar datos fuera de Chile, por ejemplo en servicios en la nube, es una transferencia internacional. Se permite hacia países con nivel adecuado de protección o con garantías apropiadas, como cláusulas contractuales, y debe informarse al titular."},
+  derecho:{art:"Arts. 4 a 9",t:"Acceso: saber qué datos se tienen. Rectificación: corregirlos. Supresión: borrarlos. Oposición: oponerse a un uso. Portabilidad: recibirlos en formato electrónico. Bloqueo: suspender temporalmente su tratamiento."},
+  recibida:{art:"Art. 11 (procedimiento ante el responsable)",t:"El responsable debe acusar recibo y pronunciarse a más tardar dentro de 30 días corridos desde el ingreso de la solicitud. El plazo puede prorrogarse por una sola vez, hasta por 30 días."},
+  estado:{art:"Art. 11",t:"Si la solicitud se rechaza total o parcialmente, la respuesta debe ser fundada. El titular puede reclamar ante la Agencia de Protección de Datos Personales."},
+  canalsol:{art:"Art. 11",t:"Registra por dónde llegó la solicitud: sirve para probar la fecha de ingreso, desde la que corre el plazo."},
+  incidente:{art:"Art. 14 sexies (vulneraciones de seguridad)",t:"Ante una vulneración de seguridad que genere un riesgo razonable para los titulares, hay que informar a la Agencia por los medios más expeditos posibles y sin dilaciones indebidas. La ley no fija un número de horas."},
+  afectados:{art:"Art. 14 sexies",t:"El registro del incidente debe indicar la naturaleza de la vulneración, sus efectos, las categorías de datos, el número aproximado de titulares afectados y las medidas adoptadas."},
+  incsens:{art:"Art. 14 sexies",t:"Además de la Agencia, debe informarse a los afectados cuando la vulneración involucra ciertas categorías de datos, como datos sensibles, de niños, niñas y adolescentes, o relativos a obligaciones económicas o financieras."},
+  medidas:{art:"Arts. 14 quinquies y 14 sexies",t:"Debes registrar las medidas para gestionar el incidente y evitar que se repita."},
+  politica:{art:"Art. 14 ter (deber de información y transparencia)",t:"La empresa debe mantener disponible, de forma permanente y accesible, su política de tratamiento: qué datos trata, para qué, con qué base legal, a quién los comunica, por cuánto tiempo y cómo ejercer los derechos."},
+  camaras:{art:"Arts. 3, 14 ter y 15 ter",t:"La imagen de una persona es un dato personal. Si hay cámaras, hay que informarlo con letreros visibles, indicar la finalidad y fijar cuánto tiempo se guardan las grabaciones. Si las cámaras vigilan de forma sistemática zonas de acceso público, la ley exige además una evaluación de impacto previa (art. 15 ter)."},
+  seguridad:{art:"Art. 14 quinquies (deber de seguridad)",t:"El responsable debe adoptar medidas técnicas y organizativas apropiadas al riesgo, que aseguren la confidencialidad, integridad, disponibilidad y resiliencia de los sistemas, como control de accesos, cifrado y respaldos."},
+  secreto:{art:"Art. 14 bis (deber de secreto)",t:"Quienes trabajan con datos personales deben guardar secreto sobre ellos, incluso después de terminar su relación con la empresa."},
+  ia:{art:"Arts. 3, 8 bis y 14 quinquies",t:"Ingresar datos de clientes o trabajadores en herramientas de IA externas puede ser una comunicación de datos a terceros e incluso una transferencia internacional. Además, las personas pueden oponerse a decisiones basadas solo en tratamiento automatizado (art. 8 bis)."},
+  sanciones:{art:"Título de infracciones y sanciones",t:"Las infracciones se clasifican en leves, graves y gravísimas, con multas de hasta 20.000 UTM, que pueden aumentar en caso de reincidencia. Durante el primer año de vigencia, las pymes reciben amonestación por escrito en lugar de multa."}
+};
+
+const AREAS=[
+  {id:"A",name:"Gobierno e inventario"},
+  {id:"B",name:"Bases legales y transparencia"},
+  {id:"C",name:"Derechos de las personas"},
+  {id:"D",name:"Seguridad e incidentes"},
+  {id:"E",name:"Proveedores y transferencias"}
+];
+// Opción: [texto, puntos(0-3), hallazgo, medida]. Las de 3 puntos no generan medida.
+const Q=[
+  {id:"gob",a:"A",ref:"gobierno",t:"¿Hay alguien a cargo de la protección de datos en la empresa?",o:[
+    ["Sí, una persona designada con funciones definidas",3],
+    ["Lo ve la gerencia cuando surge un tema",1,"No hay un responsable designado para la protección de datos.","Designar formalmente a un encargado de protección de datos, con funciones y tiempo asignado, y comunicarlo al equipo."],
+    ["Nadie se ocupa del tema",0,"Nadie se ocupa de la protección de datos en la empresa.","Designar de inmediato a un encargado de protección de datos y asignarle la ejecución de este plan."]]},
+  {id:"inv",a:"A",ref:"politica",t:"¿Qué tan claro tienen qué datos personales guarda la empresa?",o:[
+    ["Hay un registro escrito y actualizado",3],
+    ["Lo sabemos, pero no está escrito",2,"El conocimiento de los datos tratados no está documentado.","Documentar el inventario de tratamientos en la sección Registros: datos, titulares, finalidad, base legal, conservación y accesos."],
+    ["Solo en parte",1,"El inventario de datos personales es parcial.","Completar el inventario revisando cada área: ventas, recursos humanos, contabilidad, marketing y seguridad."],
+    ["No lo sabemos",0,"La empresa desconoce qué datos personales trata.","Levantar el inventario completo de tratamientos. Es la base de todas las demás medidas."]]},
+  {id:"sen",a:"A",ref:"sensibles",multi:true,t:"¿Cuáles de estos datos trata la empresa? Puedes marcar varios.",o:[
+    ["Ninguno de estos",3],
+    ["Salud (licencias médicas, exámenes, alergias)"],
+    ["Biométricos (huella digital, reconocimiento facial)"],
+    ["Datos de niños, niñas o adolescentes"],
+    ["Afiliación sindical, origen étnico o creencias"]],
+   hall:sel=>`Se tratan datos sensibles o de especial protección: ${sel.join("; ")}.`,
+   med:"Verificar que cada uno cuente con consentimiento expreso o una autorización legal, restringir el acceso a quienes lo necesiten, reforzar su seguridad y evaluar alternativas menos invasivas."},
+  {id:"con",a:"A",ref:"conservacion",t:"¿Cuánto tiempo guardan los datos personales?",o:[
+    ["Hay plazos definidos y se eliminan periódicamente",3],
+    ["Hay plazos, pero no se elimina nada",1,"Existen plazos de conservación que no se aplican.","Programar una revisión semestral para eliminar o anonimizar los datos que superaron su plazo, respetando los plazos tributarios y laborales."],
+    ["Se guarda todo indefinidamente",0,"Los datos se conservan sin límite de tiempo.","Fijar un plazo de conservación para cada tratamiento y eliminar los datos que ya no se necesitan."]]},
+  {id:"mkt",a:"B",ref:"base",t:"¿Cómo obtienen el permiso para enviar publicidad o usar datos para fines distintos de la venta?",o:[
+    ["No enviamos publicidad ni usamos datos para otros fines",3],
+    ["Con consentimiento expreso que queda registrado",3],
+    ["Con una casilla premarcada o un aviso general",1,"El consentimiento para publicidad no es expreso.","Reemplazar casillas premarcadas por un consentimiento expreso, específico y registrado, y permitir retirarlo fácilmente."],
+    ["No pedimos permiso",0,"Se usan datos para publicidad sin base legal.","Suspender los envíos a quienes no consintieron y obtener consentimiento expreso antes de retomarlos."]]},
+  {id:"pol",a:"B",ref:"politica",t:"¿La empresa tiene una política de privacidad?",o:[
+    ["Sí, publicada y actualizada a la nueva ley",3],
+    ["Sí, pero es antigua o genérica",1,"La política de privacidad no está actualizada a la Ley 21.719.","Actualizar la política con la información que exige el art. 14 ter y publicarla en la web y en el local."],
+    ["No tenemos",0,"No existe política de privacidad.","Redactar y publicar una política de privacidad (puede generarse en la sección Documentos)."]]},
+  {id:"cam",a:"B",ref:"camaras",t:"¿Usan cámaras de vigilancia?",o:[
+    ["No",3],
+    ["Sí, con letreros y plazo de borrado definido",3],
+    ["Sí, con letreros pero sin plazo de borrado",1,"Las grabaciones no tienen plazo de conservación.","Definir cuánto tiempo se guardan las grabaciones, quién puede verlas, e indicarlo en el letrero."],
+    ["Sí, sin letreros",0,"Hay videovigilancia sin informar a las personas.","Instalar letreros visibles de zona videovigilada con la finalidad, el plazo de conservación y el contacto para ejercer derechos."]]},
+  {id:"asi",a:"B",ref:"sensibles",t:"¿Cómo registran la asistencia de los trabajadores?",o:[
+    ["Libro, tarjeta o app sin datos biométricos",3],
+    ["Huella o rostro, con información escrita y una alternativa",2,"El control de asistencia usa datos biométricos.","Mantener la información escrita al trabajador, limitar el acceso a los registros biométricos y revisar periódicamente si siguen siendo necesarios."],
+    ["Huella o rostro, sin información a los trabajadores",0,"Se tratan datos biométricos de trabajadores sin informarles.","Informar por escrito a los trabajadores, verificar la base legal, ofrecer una alternativa no biométrica y reforzar la seguridad del sistema."]]},
+  {id:"can",a:"C",ref:"canal",t:"¿Por dónde puede una persona pedir ver, corregir o borrar sus datos?",o:[
+    ["Un correo o formulario específico, con registro",3],
+    ["Por los canales generales, sin registro",1,"Las solicitudes de derechos llegan por canales generales sin registro.","Habilitar un correo de privacidad, informarlo en la política y registrar cada solicitud en la sección Registros."],
+    ["No hay un canal",0,"No existe canal para ejercer los derechos.","Crear un correo de privacidad, publicarlo y definir quién responde las solicitudes."]]},
+  {id:"pla",a:"C",ref:"recibida",t:"Si alguien pide borrar sus datos, ¿cuándo responderían?",o:[
+    ["Dentro de 30 días corridos, con registro de la respuesta",3],
+    ["Cuando se pueda, sin un plazo fijo",1,"No se controla el plazo legal de respuesta.","Registrar cada solicitud con su fecha de ingreso y responder dentro de 30 días corridos, prorrogables una vez."],
+    ["No sabríamos qué hacer",0,"No existe procedimiento para responder solicitudes.","Definir un procedimiento simple: acusar recibo, verificar identidad, responder en 30 días corridos y fundar cualquier rechazo."]]},
+  {id:"acc",a:"D",ref:"seguridad",t:"¿Cómo se protegen los accesos a sistemas y correos?",o:[
+    ["Claves individuales, doble verificación y accesos por cargo",3],
+    ["Claves individuales sin doble verificación",1,"Los accesos no tienen doble verificación.","Activar la doble verificación en correo, banca y sistemas, y revisar los permisos según el cargo."],
+    ["Hay claves compartidas entre varias personas",0,"Se usan claves compartidas.","Crear cuentas individuales, activar doble verificación y cambiar todas las claves compartidas."]]},
+  {id:"res",a:"D",ref:"seguridad",t:"¿Respaldan la información y protegen los equipos?",o:[
+    ["Respaldos periódicos probados y equipos con cifrado",3],
+    ["Respaldos ocasionales",1,"Los respaldos no son periódicos ni probados.","Programar respaldos automáticos, probar la restauración y cifrar notebooks y teléfonos de trabajo."],
+    ["No hay respaldos",0,"No existen respaldos de la información.","Implementar respaldos automáticos fuera de los equipos de trabajo y cifrar los dispositivos."]]},
+  {id:"inc",a:"D",ref:"incidente",t:"Si se pierde un notebook o hackean una cuenta, ¿qué harían?",o:[
+    ["Seguiríamos un procedimiento escrito con responsables",3],
+    ["Sabríamos a quién avisar, pero no hay procedimiento",1,"No hay procedimiento escrito ante vulneraciones.","Formalizar el procedimiento ante filtraciones (sección Documentos) y registrar cada incidente."],
+    ["No sabríamos qué hacer",0,"La empresa no está preparada para responder a una filtración.","Adoptar un procedimiento ante filtraciones, con responsables para avisar a la Agencia y a los afectados."]]},
+  {id:"cap",a:"D",ref:"secreto",t:"¿Los trabajadores saben cómo tratar los datos personales?",o:[
+    ["Recibieron capacitación y firmaron un compromiso de confidencialidad",3],
+    ["Solo instrucciones informales",1,"El personal no tiene capacitación ni compromiso formal.","Capacitar al equipo y firmar un anexo de confidencialidad (sección Documentos)."],
+    ["No se ha tratado el tema",0,"El personal desconoce sus obligaciones sobre datos personales.","Realizar una capacitación básica, firmar anexos de confidencialidad y actualizar el reglamento interno."]]},
+  {id:"ia",a:"D",ref:"ia",t:"¿Usan herramientas de IA (ChatGPT u otras) con datos de clientes o trabajadores?",o:[
+    ["No usamos IA con datos personales",3],
+    ["Sí, con reglas internas sobre qué se puede ingresar",3],
+    ["Sí, sin reglas",0,"Se ingresan datos personales en herramientas de IA sin control.","Definir una política de uso de IA: qué datos nunca se ingresan, qué herramientas están autorizadas y quién responde."]]},
+  {id:"pro",a:"E",ref:"acceso",t:"Los proveedores que manejan sus datos (contador, nube, remuneraciones), ¿tienen contrato?",o:[
+    ["Sí, con cláusulas de protección de datos",3],
+    ["Hay contrato, pero sin cláusulas de datos",1,"Los contratos con proveedores no regulan el tratamiento de datos.","Agregar la cláusula de encargado de tratamiento a los contratos vigentes (sección Documentos)."],
+    ["No hay contrato escrito",0,"Proveedores tratan datos de la empresa sin contrato.","Formalizar contratos escritos con cada proveedor que accede a datos personales, con cláusula de encargado de tratamiento."]]},
+  {id:"ext",a:"E",ref:"extranjero",t:"¿Dónde se almacenan los datos de la empresa?",o:[
+    ["Solo en equipos o servidores en Chile",3],
+    ["En servicios extranjeros, con garantías revisadas e informadas",3],
+    ["En servicios extranjeros, sin revisar sus condiciones",1,"Hay transferencia internacional sin garantías revisadas.","Revisar que cada servicio extranjero ofrezca garantías adecuadas e informar la transferencia en la política de privacidad."],
+    ["No sabemos",0,"Se desconoce dónde se almacenan los datos.","Identificar todos los servicios en la nube que usa la empresa y dónde guardan la información."]]}
+];
+const MAXP=Q.length*3;
+const CORTO={gob:"Designar un encargado de datos",inv:"Levantar el inventario de datos",sen:"Proteger los datos sensibles",con:"Definir plazos de conservación",mkt:"Pedir consentimiento para publicidad",pol:"Publicar la política de privacidad",cam:"Informar las cámaras de vigilancia",asi:"Regularizar el control con huella",can:"Habilitar un canal de solicitudes",pla:"Responder solicitudes en 30 días",acc:"Activar doble verificación",res:"Respaldar y cifrar la información",inc:"Preparar el plan ante filtraciones",cap:"Capacitar al equipo",ia:"Regular el uso de IA",pro:"Firmar cláusulas con proveedores",ext:"Revisar servicios en el extranjero"};
+Q.forEach(q=>q.c=CORTO[q.id]);
+
+const RUBROS=["Comercio","Salud","Educación","Servicios profesionales","Construcción","Gastronomía y turismo","Transporte","Tecnología","Otro"];
+const TAMANOS=["1 a 9 trabajadores","10 a 49 trabajadores","50 a 199 trabajadores","200 o más"];
+const ROLES=["Dueño o gerente","Encargado de datos","Asesor externo o contador"];
+const EMPRESA_FIELDS=[
+  {id:"razon",label:"Razón social",type:"text",req:true,ref:"responsable",ph:"Requerido"},
+  {id:"rut",label:"RUT",type:"text",ph:"76.123.456-7"},
+  {id:"rubro",label:"Rubro",type:"select",options:RUBROS},
+  {id:"tamano",label:"Tamaño",type:"select",options:TAMANOS},
+  {id:"rol",label:"Tu rol",type:"select",options:ROLES,ref:"rol"},
+  {id:"responsable",label:"Encargado de datos",type:"text",ph:"Cargo o nombre",ref:"gobierno"},
+  {id:"correo",label:"Correo de privacidad",type:"email",ph:"Opcional",ref:"canal"},
+  {id:"web",label:"Sitio web",type:"text",ph:"Opcional"},
+  {id:"direccion",label:"Dirección",type:"text",ph:"Opcional"}
+];
+const SPECS={
+  inventario:{title:"Tratamiento",fields:[
+    {id:"nombre",label:"Nombre",type:"text",req:true,ph:"Clientes con despacho"},
+    {id:"titulares",label:"Titulares",type:"select",options:["Clientes","Trabajadores","Postulantes","Proveedores","Visitas","Otros"],ref:"titulares"},
+    {id:"datos",label:"Datos",type:"text",ph:"Nombre, RUT, dirección",ref:"datos"},
+    {id:"sensibles",label:"Datos sensibles",type:"select",options:["No","Sí"],ref:"sensibles"},
+    {id:"finalidad",label:"Finalidad",type:"text",ph:"Despachar pedidos",ref:"finalidad"},
+    {id:"base",label:"Base legal",type:"select",options:["Sin definir","Consentimiento","Contrato","Obligación legal","Interés legítimo"],ref:"base"},
+    {id:"conservacion",label:"Conservación",type:"text",ph:"6 años",ref:"conservacion"},
+    {id:"acceso",label:"Quién accede",type:"text",ph:"Ventas, contador",ref:"acceso"},
+    {id:"extranjero",label:"Fuera de Chile",type:"select",options:["No","Sí","No sé"],ref:"extranjero"}]},
+  solicitudes:{title:"Solicitud",fields:[
+    {id:"titular",label:"Solicitante",type:"text",req:true,ph:"Nombre"},
+    {id:"derecho",label:"Derecho",type:"select",options:DERECHOS,ref:"derecho"},
+    {id:"recibida",label:"Recibida",type:"date",req:true,ref:"recibida"},
+    {id:"canal",label:"Canal",type:"select",options:["Correo","Formulario web","Presencial","Otro"],ref:"canalsol"},
+    {id:"estado",label:"Estado",type:"select",options:["Pendiente","En revisión","Prorrogada","Respondida","Rechazada con fundamento"],ref:"estado"},
+    {id:"nota",label:"Detalle",type:"textarea"}]},
+  incidentes:{title:"Incidente",fields:[
+    {id:"descripcion",label:"Qué pasó",type:"text",req:true,ph:"Robo de notebook",ref:"incidente"},
+    {id:"fecha",label:"Detectado",type:"date",req:true,ref:"incidente"},
+    {id:"afectados",label:"Afectados",type:"number",ph:"0",ref:"afectados"},
+    {id:"datos",label:"Datos afectados",type:"text",ref:"afectados"},
+    {id:"sensibles",label:"Sensibles, financieros o de menores",type:"select",options:["No","Sí"],ref:"incsens"},
+    {id:"agencia",label:"Aviso a la Agencia",type:"select",options:["No","Sí","No corresponde"],ref:"incidente"},
+    {id:"titulares",label:"Aviso a afectados",type:"select",options:["No","Sí","No corresponde"],ref:"incsens"},
+    {id:"estado",label:"Estado",type:"select",options:["Abierto","Contenido","Cerrado"]},
+    {id:"medidas",label:"Medidas adoptadas",type:"textarea",ref:"medidas"}]}
+};
+const DOCS=[
+  {id:"politica",name:"Política de privacidad",d:"Web, local o app",ref:"politica",c:"var(--blue)"},
+  {id:"consentimiento",name:"Cláusula de consentimiento",d:"Formularios y marketing",ref:"base",c:"var(--green)"},
+  {id:"trabajadores",name:"Anexo para trabajadores",d:"Confidencialidad y uso de IA",ref:"secreto",c:"var(--indigo)"},
+  {id:"encargado",name:"Cláusula para proveedores",d:"Encargado de tratamiento",ref:"acceso",c:"var(--orange)"},
+  {id:"incidentes",name:"Procedimiento ante filtraciones",d:"Pasos internos",ref:"incidente",c:"var(--red)"},
+  {id:"camaras",name:"Letrero de videovigilancia",d:"Zona videovigilada",ref:"camaras",c:"#8e8e93"}
+];
+
+// ================== Marca ==================
+// Logo: insignia azul marino con escudo y visto "en regla" (dato protegido y cumplido).
+const LOGO=(cls="")=>`<svg class="${cls}" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg${cls}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1b4a7a"/><stop offset="1" stop-color="#12355b"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#lg${cls})"/><rect x="14" y="12" width="29" height="39" rx="4.5" fill="#fff"/><rect x="22" y="8.5" width="13" height="7.5" rx="2.5" fill="#c9d6e6"/><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m18.5 23.5 2.3 2.3 4-4.4M18.5 32 20.8 34.3l4-4.4M18.5 40.5l2.3 2.3 4-4.4" stroke="#12a37a" stroke-width="2.6"/><path d="M28.5 23.8h9M28.5 32.3h9M28.5 40.8h5" stroke="#c3cfdd" stroke-width="2.6"/></g><circle cx="45" cy="45" r="12" fill="#12a37a" stroke="#12355b" stroke-width="3"/><rect x="39.6" y="44" width="10.8" height="8.4" rx="1.8" fill="#fff"/><path d="M41.9 44v-2.6a3.1 3.1 0 0 1 6.2 0V44" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="45" cy="47.8" r="1.3" fill="#12a37a"/></svg>`;
+const APP={version:"1.0.0",creador:"Mauroblues",correo:"miperrihijo@gmail.com",privacidad:"https://mauroalcainosa-rgb.github.io/pyme-en-regla/privacidad.html"};
+const NOMBRE="Pyme en Regla", LEYENDA="Cumple la Ley 21.719 de protección de datos personales";
+const WORDMARK=`<span>Pyme <span class="en">en Regla</span></span>`;
+
+// ================== Íconos ==================
+const I={
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="m8 9 1.5 1.5L12 8M8 15l1.5 1.5L12 14M14.5 9.5H17M14.5 15.5H17"/></svg>',
+  folder:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6.5A2.5 2.5 0 0 1 5.5 4h4l2 2.2h7A2.5 2.5 0 0 1 21 8.7v8.8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5Z"/></svg>',
+  doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h8l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M14 3v5h5M8 13h8M8 17h6"/></svg>',
+  chart:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="12" width="4" height="9" rx="1.2"/><rect x="10" y="7" width="4" height="14" rx="1.2"/><rect x="17" y="3" width="4" height="18" rx="1.2"/></svg>',
+  info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9.2"/><path d="M12 11v6" stroke-linecap="round"/><circle cx="12" cy="7.6" r="1.1" fill="currentColor" stroke="none"/></svg>',
+  lock:'<svg viewBox="0 0 24 24" fill="#fff"><path d="M7 10V8a5 5 0 0 1 10 0v2h.5A1.5 1.5 0 0 1 19 11.5v8A1.5 1.5 0 0 1 17.5 21h-11A1.5 1.5 0 0 1 5 19.5v-8A1.5 1.5 0 0 1 6.5 10Zm2 0h6V8a3 3 0 0 0-6 0Z"/></svg>',
+  docw:'<svg viewBox="0 0 24 24" fill="#fff"><path d="M6 2.5h8l5 5v13a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 20.5V4a1.5 1.5 0 0 1 1-1.5Zm7.5 1.2V8h4.3ZM8 12v1.6h8V12Zm0 3.5v1.6h6v-1.6Z"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  track:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16"/><path d="m7 14 4-4 3 3 5-6"/></svg>',
+  clip:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m20 11.5-7.8 7.8a5 5 0 0 1-7.1-7.1l8.3-8.3a3.3 3.3 0 0 1 4.7 4.7l-8.3 8.3a1.7 1.7 0 0 1-2.4-2.4l7.6-7.6"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.5 4.5 5.5v6c0 4.6 3.2 8.7 7.5 10 4.3-1.3 7.5-5.4 7.5-10v-6Z"/></svg>',
+  shieldck:'<svg viewBox="0 0 24 24"><path fill="#fff" d="M12 2.5 4.5 5.5v6c0 4.6 3.2 8.7 7.5 10 4.3-1.3 7.5-5.4 7.5-10v-6Z"/><path d="m8.5 12 2.4 2.4 4.6-4.8" fill="none" stroke="var(--blue)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
+const TABS=[{id:"encuesta",name:"Encuesta",i:"check"},{id:"informe",name:"Informe",i:"chart"},{id:"seguimiento",name:"Seguimiento",i:"track"},{id:"registros",name:"Registros",i:"folder"},{id:"documentos",name:"Documentos",i:"doc"}];
+const ESTADOS=["Pendiente","En curso","Corregida"];
+
+// ================== Estado y almacenamiento ==================
+function uid(){return Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4)}
+function iso(off=0){const d=new Date();d.setDate(d.getDate()+off);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function blankData(){return {enc:{},paso:-1,hechas:{},brechas:{},fechaDiag:null,inventario:[],solicitudes:[],incidentes:[],documentos:[],resumen:""}}
+
+let P={perfiles:[],activo:null}, DATA={}, MODE="memoria", DB=null, UID=null, SAMPLE=null, DL=null, ASSETS=null, LOADED=false;
+let segFiltro="Activas";
+let tab=(location.hash||"").slice(1); if(!TABS.some(t=>t.id===tab)) tab="encuesta";
+let regSeg="inventario";
+let NEW=null; // perfil en creación durante la encuesta
+
+async function getDoc(k){
+  if(MODE==="db"){const r=await DB.collection("data/users/"+UID).doc(k).get();const v=r&&typeof r.data==="function"?r.data():r;return v&&typeof v.json==="string"?JSON.parse(v.json):null}
+  if(MODE==="local"){const raw=localStorage.getItem("der3:"+k);return raw?JSON.parse(raw):null}
+  return null;
+}
+let chain=Promise.resolve();
+function setDoc(k,val){
+  chain=chain.then(async()=>{
+    try{
+      if(MODE==="db") await DB.collection("data/users/"+UID).doc(k).set({json:JSON.stringify(val),actualizado:new Date().toISOString()});
+      else if(MODE==="local") localStorage.setItem("der3:"+k,JSON.stringify(val));
+    }catch(e){toast("No se pudo guardar. Revisa tu conexión.")}
+  });
+}
+function borrarDoc(k){chain=chain.then(async()=>{try{if(MODE==="db")await DB.collection("data/users/"+UID).doc(k).delete();else if(MODE==="local")localStorage.removeItem("der3:"+k)}catch(e){}})}
+function saveP(){setDoc("perfiles",P)}
+function saveD(){if(P.activo) setDoc("enc_"+P.activo,DATA[P.activo])}
+function D(){if(!P.activo){return NEW?NEW.data:blankData()}return DATA[P.activo]||(DATA[P.activo]=blankData())}
+function E(){return P.perfiles.find(p=>p.id===P.activo)||(NEW?NEW.emp:{})}
+
+// ================== Publicidad (AdMob) ==================
+// Reglas: nunca durante la encuesta, formularios ni hojas abiertas; banner solo en pantallas de consulta;
+// intersticial solo en pausas naturales (al ver resultados y tras generar un PDF), máx. 1 cada 4 min y nunca en los 2 primeros minutos.
+const ADC=Object.assign({testing:true,banner:"ca-app-pub-3940256099942544/9214589741",interstitial:"ca-app-pub-3940256099942544/1033173712",intervaloMin:4,graciaMin:2},window.ADS_CONFIG||{});
+const Ads={ok:false,A:null,ready:false,last:0,t0:Date.now(),on:false,made:false,
+  async init(){const A=PL.AdMob;if(!NATIVE||!A)return;this.A=A;
+    try{await A.initialize({});
+      try{const c=await A.requestConsentInfo();if(c&&c.isConsentFormAvailable&&c.status==="REQUIRED")await A.showConsentForm()}catch(e){}
+      this.ok=true;this.prep();this.sync()}catch(e){}},
+  async prep(){try{await this.A.prepareInterstitial({adId:ADC.interstitial,isTesting:ADC.testing});this.ready=true}catch(e){this.ready=false}},
+  async inter(){if(!this.ok||!this.ready)return;const n=Date.now();if(n-this.t0<ADC.graciaMin*60000||n-this.last<ADC.intervaloMin*60000)return;
+    this.ready=false;try{await this.A.showInterstitial();this.last=Date.now()}catch(e){}setTimeout(()=>this.prep(),1000)},
+  sync(){const show=!!P.activo&&["informe","seguimiento","registros","documentos"].includes(tab)&&!sheet.open;this.banner(show)},
+  async banner(show){if(!this.ok||show===this.on)return;this.on=show;document.body.classList.toggle("has-banner",show);
+    try{if(show){if(!this.made){const tb=document.querySelector(".tabbar");await this.A.showBanner({adId:ADC.banner,adSize:"ADAPTIVE_BANNER",position:"BOTTOM_CENTER",margin:tb?Math.round(tb.getBoundingClientRect().height):60,isTesting:ADC.testing});this.made=true}else await this.A.resumeBanner()}
+      else if(this.made)await this.A.hideBanner()}catch(e){}}
+};
+
+// ================== Plataforma local (teléfono) ==================
+const CAP=window.Capacitor, NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform()), PL=(CAP&&CAP.Plugins)||{};
+const IDB={_db:null,
+  open(){if(this._db)return Promise.resolve(this._db);return new Promise((ok,ko)=>{const r=indexedDB.open("pyme-en-regla",1);r.onupgradeneeded=()=>r.result.createObjectStore("blobs");r.onsuccess=()=>{this._db=r.result;ok(this._db)};r.onerror=()=>ko(r.error)})},
+  async tx(mode,fn){const db=await this.open();return new Promise((ok,ko)=>{const t=db.transaction("blobs",mode);const st=t.objectStore("blobs");const q=fn(st);t.oncomplete=()=>ok(q&&q.result);t.onerror=()=>ko(t.error)})},
+  put(id,b){return this.tx("readwrite",s=>s.put(b,id))},get(id){return this.tx("readonly",s=>s.get(id))},del(id){return this.tx("readwrite",s=>s.delete(id))},clear(){return this.tx("readwrite",s=>s.clear())}};
+function blobToB64(b){return new Promise((ok,ko)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(",")[1]);r.onerror=ko;r.readAsDataURL(b)})}
+const LOCAL_DL={async save({filename,data}){
+  const blob=data instanceof Blob?data:new Blob([data],{type:filename.endsWith(".json")?"application/json":"text/plain"});
+  if(NATIVE&&PL.Filesystem&&PL.Share){
+    const safe=filename.replace(/[^\w.\- áéíóúñÁÉÍÓÚÑ]/g,"");
+    const w=await PL.Filesystem.writeFile({path:safe,data:await blobToB64(blob),directory:"CACHE"});
+    try{await PL.Share.share({title:safe,files:[w.uri]})}catch(e){throw {code:"declined"}}
+    return {status:"saved"};
+  }
+  const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return {status:"saved"};
+}};
+const LOCAL_ASSETS={async upload(f){if(f.size>20*1024*1024)throw {code:"too_large"};const id=uid()+uid();await IDB.put(id,f);return {id,contentType:f.type||"application/octet-stream"}},async delete(id){await IDB.del(id)}};
+async function hidratar(root){for(const el of root.querySelectorAll("[data-blob]")){try{const b=await IDB.get(el.dataset.blob);if(b)el.src=URL.createObjectURL(b)}catch(e){}}}
+async function abrirArchivo(id,nombre){try{const b=await IDB.get(id);if(!b){toast("No se encontró el archivo.");return}await DL.save({filename:nombre,data:b})}catch(e){if(!e||e.code!=="declined")toast("No se pudo abrir el archivo.")}}
+function abrirEnlace(url){if(NATIVE&&PL.Browser)PL.Browser.open({url});else window.open(url,"_blank","noopener")}
+
+async function cargar(){
+  try{localStorage.setItem("der3:t","1");MODE="local"}catch(e){MODE="memoria"}
+  try{const p=await getDoc("perfiles");
+    if(p&&p.perfiles&&p.perfiles.length){P=p;for(const pf of P.perfiles){const d=await getDoc("enc_"+pf.id);DATA[pf.id]=Object.assign(blankData(),d||{})}}
+  }catch(e){toast("No se pudieron cargar tus datos guardados.")}
+  SAMPLE=null; DL=LOCAL_DL; ASSETS=LOCAL_ASSETS;
+  LOADED=true;
+  if(!location.hash&&P.activo&&D().paso>Q.length) tab="informe";
+  render(); Ads.init();
+}
+async function cambiarPerfil(id){P.activo=id;NEW=null;saveP();closeSheet();tab=D().paso>Q.length?"informe":"encuesta";render();toast("Empresa activa: "+E().razon)}
+
+// ================== Utilidades ==================
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function pISO(s){if(!s)return null;const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
+function hoy(){const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+function dias(a,b){return Math.round((b-a)/86400000)}
+function fmt(d){return d?d.toLocaleDateString("es-CL",{day:"2-digit",month:"2-digit",year:"numeric"}):"—"}
+function initials(s){return (s||"+").replace(/\b(SpA|S\.A\.|Ltda\.?|EIRL)\b/gi,"").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase()||"+"}
+let tt;function toast(m){document.querySelectorAll(".toast").forEach(x=>x.remove());const b=document.createElement("div");b.className="toast";b.setAttribute("role","status");b.textContent=m;document.body.appendChild(b);clearTimeout(tt);tt=setTimeout(()=>b.remove(),3200)}
+function infoBtn(r){return r?`<button type="button" class="info" data-ref="${r}" aria-label="Ver referencia legal">${I.info}</button>`:""}
+function pill(c,t){return `<span class="pill ${c}">${esc(t)}</span>`}
+
+// ================== Puntaje y medidas ==================
+function evalQ(q,ans){
+  if(ans===undefined||ans===null||(Array.isArray(ans)&&!ans.length)) return null;
+  if(q.multi){
+    const sel=ans.filter(i=>i>0).map(i=>q.o[i][0]);
+    if(!sel.length) return {pts:3};
+    return {pts:sel.length>=2?0:1,h:q.hall(sel),m:q.med};
+  }
+  const o=q.o[ans]; return {pts:o[1],h:o[2],m:o[3]};
+}
+function score(d=D()){
+  let pts=0,resp=0,act=0;const med=[],ok=[];
+  const areas=AREAS.map(a=>({...a,p:0,max:0,resp:0}));
+  for(const q of Q){
+    const r=evalQ(q,d.enc[q.id]); const ar=areas.find(x=>x.id===q.a); ar.max+=3;
+    if(!r) continue; resp++; pts+=r.pts; ar.p+=r.pts; ar.resp++;
+    if(r.pts<3){const m={id:q.id,c:q.c,area:ar.name,h:r.h,m:r.m,ref:q.ref,prio:r.pts===0?"alta":"media",plazo:r.pts===0?"30 días":"90 días",pts:r.pts};
+      Object.assign(m,brecha(d,m));m.hecha=m.estado==="Corregida";med.push(m);act+=m.hecha?3:r.pts;}
+    else {ok.push(q);act+=3}
+  }
+  med.sort((a,b)=>(a.prio==="alta"?0:1)-(b.prio==="alta"?0:1));
+  const pct=Math.round(pts*100/MAXP), falt=Q.length-resp;
+  const nivel=falt?"info":pct>=80?"ok":pct>=50?"warn":"bad";
+  const nivelTxt=falt?`Encuesta ${resp}/${Q.length}`:pct>=80?"Bien encaminada":pct>=50?"Cumplimiento parcial":"Riesgo alto";
+  areas.forEach(a=>a.pct=Math.round(a.p*100/a.max));
+  const pctAct=Math.round(act*100/MAXP);
+  return {pct,pctAct,resp,falt,nivel,nivelTxt,areas,med,ok,hechas:med.filter(m=>m.hecha).length};
+}
+
+// ================== Brechas y alertas ==================
+function baseDate(d){return pISO(d.fechaDiag)||hoy()}
+function brecha(d,m){
+  const b=d.brechas[m.id]||{};
+  let vence=b.vence;if(!vence){const v=new Date(baseDate(d));v.setDate(v.getDate()+(m.prio==="alta"?30:90));vence=v.getFullYear()+"-"+String(v.getMonth()+1).padStart(2,"0")+"-"+String(v.getDate()).padStart(2,"0")}
+  const estado=b.estado||(d.hechas&&d.hechas[m.id]?"En curso":"Pendiente");
+  const resp=b.respaldos||[];const dl=dias(hoy(),pISO(vence));
+  const alerta=estado==="Corregida"?"ok":dl<0?"bad":dl<=7?"warn":"none";
+  return {estado,responsable:b.responsable||"",vence,dl,respaldos:resp,historial:b.historial||[],alerta};
+}
+function plazoPill(m){if(m.estado==="Corregida")return pill("ok","Corregida");return m.dl<0?pill("bad",`Vencida hace ${-m.dl} d`):m.dl===0?pill("bad","Vence hoy"):m.dl<=7?pill("warn",`Vence en ${m.dl} d`):pill("info",`Vence ${fmt(pISO(m.vence))}`)}
+function estadoPill(e){return pill(e==="Corregida"?"ok":e==="En curso"?"info":"warn",e)}
+function alertas(d=D()){
+  const s=score(d),a=[];
+  for(const m of s.med){if(m.estado==="Corregida")continue;
+    if(m.dl<0)a.push({n:"bad",t:`Brecha vencida hace ${-m.dl} días: ${m.c}`,b:m.id});
+    else if(m.dl<=7)a.push({n:"warn",t:`Vence en ${m.dl} días: ${m.c}`,b:m.id});
+    if(m.estado==="En curso"&&!m.respaldos.length&&m.dl<=14)a.push({n:"warn",t:`Sin respaldos y por vencer: ${m.c}`,b:m.id});
+    if(!m.responsable&&m.prio==="alta")a.push({n:"info",t:`Sin responsable asignado: ${m.c}`,b:m.id});}
+  for(const x of d.solicitudes){if(cerrada(x))continue;const v=venc(x);if(!v)continue;const dl=dias(hoy(),v);
+    if(dl<0)a.push({n:"bad",t:`Solicitud de ${x.derecho.toLowerCase()} de ${x.titular} vencida`,go:"solicitudes"});else if(dl<=7)a.push({n:"warn",t:`Solicitud de ${x.titular} vence en ${dl} días`,go:"solicitudes"})}
+  for(const x of d.incidentes){if(x.estado==="Cerrado")continue;
+    if(x.sensibles==="Sí"&&x.titulares!=="Sí")a.push({n:"bad",t:`Incidente sin aviso a afectados: ${x.descripcion}`,go:"incidentes"});
+    else if(x.agencia==="No")a.push({n:"warn",t:`Incidente abierto sin evaluar aviso a la Agencia: ${x.descripcion}`,go:"incidentes"})}
+  if(s.falt&&s.resp)a.push({n:"info",t:`Encuesta incompleta: faltan ${s.falt} preguntas`,tab:"encuesta"});
+  const ord={bad:0,warn:1,info:2};return a.sort((x,y)=>ord[x.n]-ord[y.n]);
+}
+
+// ================== Render ==================
+function go(id){tab=id;history.replaceState(null,"","#"+id);render();window.scrollTo(0,0)}
+window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(TABS.some(t=>t.id===h)&&h!==tab){tab=h;render()}});
+function ring(pct,nivel,size=76){const c={ok:"var(--green)",warn:"var(--orange)",bad:"var(--red)",info:"var(--blue)"}[nivel];const r=size*.39,L=2*Math.PI*r,cx=size/2;
+  return `<svg class="ring" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="Cumplimiento ${pct}%"><circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="var(--fill)" stroke-width="${size*.12}"/><circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${c}" stroke-width="${size*.12}" stroke-linecap="round" stroke-dasharray="${L*pct/100} ${L}" transform="rotate(-90 ${cx} ${cx})"/><text x="${cx}" y="${cx+size*.075}" text-anchor="middle" font-size="${size*.23}" font-weight="700" fill="currentColor">${pct}%</text></svg>`}
+
+function storeTxt(){return !LOADED?"Cargando…":MODE==="local"?"Tus datos se guardan solo en este teléfono; no usamos servidores ni cuentas":"Los datos no se están guardando"}
+function render(){
+  document.getElementById("brandrow").innerHTML=LOGO("nav")+WORDMARK;
+  const e=E(), has=!!P.activo;
+  let btns=`<button type="button" class="avatar" data-act="perfiles" aria-label="Empresas">${esc(initials(e.razon))}</button>`;
+  if(tab==="registros"&&has) btns=`<button type="button" class="iconbtn" data-add="${regSeg}" aria-label="Agregar">${I.plus}</button>`+btns;
+  document.getElementById("navbtns").innerHTML=btns;
+  const portada=tab==="encuesta"&&D().paso<0;
+  document.querySelector(".largetitle").classList.toggle("hidden",portada);
+  document.getElementById("ltitle").textContent=TABS.find(t=>t.id===tab).name;
+  document.getElementById("lsub").textContent=e.razon||"";
+  const nAl=has?alertas().filter(a=>a.n==="bad").length:0;
+  document.getElementById("tabbar").innerHTML=TABS.map(t=>`<button type="button" data-tab="${t.id}" ${t.id===tab?'aria-current="page"':""} style="position:relative">${I[t.i]}<span>${t.name}</span>${t.id==="seguimiento"&&nAl?`<b class="badge" aria-label="${nAl} alertas">${nAl}</b>`:""}</button>`).join("");
+  let h;
+  if(tab!=="encuesta"&&!has) h=`<div class="intro"><p>Primero responde la encuesta. Al terminarla se crea el perfil de la empresa y se habilita esta sección.</p><button type="button" class="btn" data-go="encuesta">Ir a la encuesta</button></div>`;
+  else h=({encuesta:vEncuesta,informe:vInforme,seguimiento:vSeg,registros:vReg,documentos:vDocs})[tab]();
+  setTimeout(()=>Ads.sync(),0);
+  document.getElementById("main").innerHTML=h+`<div class="foot-brand">${LOGO("ft")}<span>Pyme en Regla · por ${APP.creador} · Orientación, no reemplaza asesoría legal.</span></div>`;
+}
+
+// ---------- Encuesta ----------
+function setPaso(n){const d=D();d.paso=n;if(n>Q.length&&!d.fechaDiag)d.fechaDiag=iso();if(P.activo)saveD();render();window.scrollTo(0,0)}
+function vEncuesta(){
+  const d=D(), paso=d.paso, N=Q.length;
+  if(paso<0){ // portada
+    const s=score(), empezada=P.activo&&s.resp>0;
+    const dv=dias(hoy(),VIGENCIA);
+    return `<div class="hero-brand">${LOGO("logo")}
+      <div class="wm">Pyme <span>en Regla</span></div>
+      <div class="tag">${LEYENDA}</div>
+      <h2>¿Tu empresa cumple la nueva ley de datos personales?</h2>
+      <p>Descúbrelo en 5 minutos y recibe la lista de lo que debes corregir.</p>
+      ${empezada?`<button type="button" class="btn" data-paso="${Math.max(1,Math.min(s.resp+1,N))}">Continuar donde quedé</button><button type="button" class="btn plain" style="color:#b9cbe0" data-act="reiniciar">Empezar de nuevo</button>`:`<button type="button" class="btn" data-paso="0">Comenzar</button>`}
+    </div>
+    <div class="section"><div class="shead">Por qué ahora</div><div class="group"><div class="cell"><div class="main">
+      <span class="title">${dv>0?`Faltan ${dv} días para que la ley entre en vigencia`:"La ley ya está vigente"}</span>
+      <span class="subtitle">Desde el 1 de diciembre de 2026, toda empresa que guarde datos de clientes o trabajadores debe cumplirla. Las multas llegan a 20.000 UTM.</span></div>${infoBtn("sanciones")}</div></div></div>
+    <div class="section"><div class="shead">Cómo funciona</div><div class="group trust">
+      <div class="cell icon"><span class="ico" style="font-weight:800;font-size:15px">1</span><div class="main"><span class="title">Responde la encuesta</span><span class="subtitle">${N} preguntas de alternativas sobre tu empresa</span></div></div>
+      <div class="cell icon"><span class="ico" style="font-weight:800;font-size:15px">2</span><div class="main"><span class="title">Recibe tu informe</span><span class="subtitle">Qué cumples, qué falta y qué medidas tomar, en PDF</span></div></div>
+      <div class="cell icon"><span class="ico" style="font-weight:800;font-size:15px">3</span><div class="main"><span class="title">Corrige y sigue tu avance</span><span class="subtitle">Plazos, alertas y respaldos de cada corrección</span></div></div>
+    </div><div class="sfoot">${storeTxt()}. ${P.activo?"":"Si asesoras a varias empresas, podrás agregar más desde el círculo de arriba a la derecha."}</div></div>
+    `;
+  }
+  if(paso===0){ // datos empresa
+    const e=E();
+    return `<div class="qhead"><div class="qmeta"><span>Paso 1 · Tu empresa</span><span>0 de ${N}</span></div><div class="progress"><i style="width:2%"></i></div></div>
+    <div class="qtitle"><h2>Cuéntanos sobre la empresa</h2></div>
+    <form id="fEmp" class="section"><div class="group">${EMPRESA_FIELDS.map(f=>fieldHTML(f,e[f.id]??(f.type==="select"?f.options[0]:""))).join("")}</div>
+    <div class="sfoot">Estos datos aparecen en el informe y en los documentos.</div>
+    <div class="navq"><button type="button" class="btn tinted" data-paso="-1">Atrás</button><button type="submit" class="btn">Siguiente</button></div></form>`;
+  }
+  if(paso>=1&&paso<=N){
+    const q=Q[paso-1], ans=d.enc[q.id], area=AREAS.find(a=>a.id===q.a);
+    const sel=i=>q.multi?(Array.isArray(ans)&&ans.includes(i)):ans===i;
+    const canNext=q.multi?(Array.isArray(ans)&&ans.length>0):ans!==undefined;
+    return `<div class="qhead"><div class="qmeta"><span>${area.name}</span><span>${paso} de ${N}</span></div><div class="progress"><i style="width:${Math.round(paso*100/N)}%"></i></div></div>
+    <div class="qtitle"><h2>${esc(q.t)}</h2>${infoBtn(q.ref)}</div>
+    <div class="section"><div class="group" role="${q.multi?"group":"radiogroup"}">${q.o.map((o,i)=>`<button type="button" class="opt" role="${q.multi?"checkbox":"radio"}" aria-checked="${sel(i)}" data-opt="${i}" data-qid="${q.id}"><span class="mark ${q.multi?"sq":""}">${sel(i)?"✓":""}</span><span>${esc(o[0])}</span></button>`).join("")}</div>
+    <div class="sfoot">${esc(REF[q.ref].art)}</div></div>
+    <div class="navq"><button type="button" class="btn tinted" data-paso="${paso-1}">Anterior</button><button type="button" class="btn" data-paso="${paso+1}" ${canNext?"":"disabled"}>${paso===N?"Terminar":"Siguiente"}</button></div>`;
+  }
+  // final
+  const s=score();
+  return `<div class="intro">${ring(s.pct,s.nivel,110)}<h2>Encuesta completada</h2><div>${pill(s.nivel,s.nivelTxt)}</div>
+    <div class="tiles" style="grid-template-columns:repeat(3,1fr);width:100%">
+      <div class="tile" style="cursor:default;background:var(--red-soft)"><b style="color:var(--red)">${s.med.filter(m=>m.prio==="alta").length}</b><span>urgentes</span></div>
+      <div class="tile" style="cursor:default;background:var(--orange-soft)"><b style="color:var(--orange)">${s.med.filter(m=>m.prio==="media").length}</b><span>a 90 días</span></div>
+      <div class="tile" style="cursor:default;background:var(--green-soft)"><b style="color:var(--green)">${s.ok.length}</b><span>ya cumples</span></div></div>
+    <button type="button" class="btn" data-go="informe">Ver informe y medidas</button>
+    <button type="button" class="btn tinted" data-go="seguimiento">Ir al tablero de seguimiento</button>
+    <button type="button" class="btn plain" data-paso="1">Revisar respuestas</button></div>`;
+}
+function elegir(qid,i){
+  const q=Q.find(x=>x.id===qid), d=D();
+  if(q.multi){let a=Array.isArray(d.enc[qid])?[...d.enc[qid]]:[];
+    if(i===0)a=a.includes(0)?[]:[0];else{a=a.filter(x=>x!==0);a=a.includes(i)?a.filter(x=>x!==i):[...a,i]}
+    d.enc[qid]=a;if(P.activo)saveD();render();}
+  else{d.enc[qid]=i;delete d.hechas[qid];if(P.activo)saveD();render();setTimeout(()=>{if(tab==="encuesta"&&D().paso===Q.findIndex(x=>x.id===qid)+1)setPaso(D().paso+1)},280)}
+}
+
+// ---------- Informe ----------
+function vInforme(){
+  const d=D(),s=score(),e=E();
+  if(s.resp===0) return `<div class="intro"><p>Aún no hay respuestas. Completa la encuesta para generar el informe.</p><button type="button" class="btn" data-go="encuesta">Ir a la encuesta</button></div>`;
+  const alta=s.med.filter(m=>m.prio==="alta"),media=s.med.filter(m=>m.prio==="media");
+  const mHTML=arr=>arr.map(m=>`<button type="button" class="cell" data-brecha="${m.id}"><span class="mark sq" style="${m.hecha?"background:var(--green);border-color:var(--green)":""}">${m.hecha?"✓":""}</span><div class="main"><span class="title" style="${m.hecha?"text-decoration:line-through;color:var(--muted)":""}">${esc(m.c)}</span><div class="pills">${m.hecha?pill("ok","Corregida"):plazoPill(m)}</div></div><span class="chev">›</span></button>`).join("");
+  const dv=dias(hoy(),VIGENCIA);
+  return `
+  <div class="hero">${ring(s.pct,s.nivel)}<div class="main"><h2>${esc(e.razon||"Tu empresa")}</h2><div>${pill(s.nivel,s.nivelTxt)}</div><p class="small">Emitido el ${fmt(hoy())}${dv>0?` · faltan ${dv} días para la vigencia`:""}</p></div></div>
+  ${s.falt?`<div class="banner"><p>Faltan ${s.falt} preguntas. El informe estará incompleto hasta que termines la encuesta.</p><button type="button" class="btn tinted" data-go="encuesta">Completar encuesta</button></div>`:""}
+  <div class="section"><button type="button" class="btn" data-act="pdf" ${DL?"":"disabled"}>Descargar informe en PDF</button>
+  ${DL?"":`<div class="sfoot">La descarga solo está disponible al abrir la app en claude.ai.</div>`}</div>
+  <div class="tiles" style="grid-template-columns:repeat(3,1fr)">
+    <div class="tile" style="cursor:default"><b style="color:var(--red)">${alta.filter(m=>!m.hecha).length}</b><span>urgentes</span></div>
+    <div class="tile" style="cursor:default"><b style="color:var(--orange)">${media.filter(m=>!m.hecha).length}</b><span>a 90 días</span></div>
+    <div class="tile" style="cursor:default"><b style="color:var(--green)">${s.ok.length+s.hechas}</b><span>ya cumples</span></div>
+  </div>
+  <div class="section"><div class="shead">Resultado por área</div><div class="group">
+    ${s.areas.map(a=>{const c=a.pct>=80?"var(--green)":a.pct>=50?"var(--orange)":"var(--red)";return `<div class="areaRow"><span>${a.name}</span><div class="bar" role="img" aria-label="${a.pct}%"><i style="width:${Math.max(a.pct,2)}%;background:${c}"></i></div><b>${a.pct}%</b></div>`}).join("")}
+  </div></div>
+  ${SAMPLE?`<div class="section"><div class="shead">Resumen ejecutivo</div><div class="group"><div class="doc" id="rtxt" ${d.resumen?"":'style="color:var(--muted)"'}>${d.resumen?esc(d.resumen):"Opcional. Claude redacta un resumen para la gerencia que se agrega al PDF."}</div></div><button type="button" class="btn tinted" data-act="resumen">${d.resumen?"Volver a redactar":"Redactar resumen con IA"}</button></div>`:""}
+  <div class="section"><div class="shead">Medidas que debe tomar la empresa · ${s.hechas}/${s.med.length} corregidas</div></div>
+  ${alta.length?`<div class="section"><div class="shead" style="color:var(--red)">Urgentes · dentro de 30 días</div><div class="group">${mHTML(alta)}</div></div>`:""}
+  ${media.length?`<div class="section"><div class="shead" style="color:var(--orange)">Corto plazo · dentro de 90 días</div><div class="group">${mHTML(media)}</div></div>`:""}
+  ${!s.med.length?`<div class="group"><div class="empty">No hay medidas pendientes según la encuesta.</div></div>`:""}
+  <div class="sfoot">Toca una medida para ver qué hacer, asignar responsable y adjuntar respaldos.</div>
+  ${s.ok.length?`<div class="section"><div class="shead">Lo que ya está bien</div><div class="group">${s.ok.map(q=>`<div class="cell"><span style="color:var(--green);font-weight:700">✓</span><div class="main"><span class="subtitle" style="color:var(--ink)">${esc(q.t.replace(/ Puedes marcar varios\./,""))}</span></div></div>`).join("")}</div></div>`:""}
+  <div class="section"><div class="shead">Siguiente paso</div><div class="group">
+    <button type="button" class="cell" data-go="registros" data-seg="inventario"><div class="main"><span class="title">Registrar el inventario de datos</span><span class="subtitle">${d.inventario.length} tratamientos registrados</span></div><span class="chev">›</span></button>
+    <button type="button" class="cell" data-go="documentos"><div class="main"><span class="title">Generar los documentos</span><span class="subtitle">Política, cláusulas y procedimientos</span></div><span class="chev">›</span></button>
+  </div><div class="sfoot">Informe de orientación según la ${LEY}. No constituye asesoría legal. <a href="${LEYCHILE}" data-ext="1">Ver la ley en LeyChile</a></div></div>`;
+}
+
+// ---------- Marca en PDF ----------
+const NAVY=[18,53,91],TEAL=[18,163,122];
+let LOGO_PNG=null;
+async function logoPNG(){
+  if(LOGO_PNG)return LOGO_PNG;
+  try{const svg=LOGO("pdf");const img=new Image();img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg.replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" '));
+    await img.decode();const c=document.createElement("canvas");c.width=c.height=256;c.getContext("2d").drawImage(img,0,0,256,256);LOGO_PNG=c.toDataURL("image/png");}catch(e){LOGO_PNG="none"}
+  return LOGO_PNG;
+}
+async function pdfHeader(doc,titulo,sub){
+  const W=210;doc.setFillColor(...NAVY);doc.rect(0,0,W,30,"F");doc.setFillColor(...TEAL);doc.rect(0,30,W,1.2,"F");
+  const png=await logoPNG();
+  if(png&&png!=="none")doc.addImage(png,"PNG",14,6,18,18);
+  else{doc.setFillColor(255,255,255);doc.roundedRect(14,6,18,18,4,4,"F");doc.setDrawColor(...TEAL);doc.setLineWidth(1.6);doc.lines([[3.2,3.2],[6.5,-7]],18.5,15.5)}
+  doc.setTextColor(255);doc.setFont("helvetica","bold");doc.setFontSize(15);doc.text("Pyme",36,14);
+  const wd=doc.getTextWidth("Pyme ");doc.setTextColor(63,209,162);doc.text("en Regla",36+wd,14);
+  doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.setTextColor(185,203,224);doc.text(LEYENDA,36,20);
+  doc.setTextColor(255);doc.setFont("helvetica","bold");doc.setFontSize(10.5);doc.text(titulo,196,14,{align:"right"});
+  doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.setTextColor(185,203,224);doc.text(sub,196,20,{align:"right"});
+  doc.setTextColor(0);return 42;
+}
+function pdfFooter(doc,e,label){
+  const n=doc.getNumberOfPages();for(let i=1;i<=n;i++){doc.setPage(i);doc.setDrawColor(220,226,234);doc.setLineWidth(.3);doc.line(16,285,194,285);
+    doc.setFontSize(8);doc.setTextColor(110,110,115);doc.text(`Pyme en Regla · ${label} · ${e.razon||""}`,16,290);doc.text(`Página ${i} de ${n}`,194,290,{align:"right"})}
+}
+
+async function pdf(){
+  if(!DL){toast("La descarga no está disponible en esta vista.");return}
+  if(!window.jspdf){toast("No se pudo cargar el generador de PDF. Recarga la página.");return}
+  const {jsPDF}=window.jspdf, doc=new jsPDF({unit:"mm",format:"a4"});
+  const d=D(),s=score(),e=E(),W=210,M=16;let y=18;
+  const blue=NAVY,gris=[110,110,115];
+  y=await pdfHeader(doc,"INFORME DE DIAGNÓSTICO","Emitido el "+fmt(hoy()));
+  doc.setFont("helvetica","bold");doc.setFontSize(17);doc.setTextColor(...NAVY);doc.text("Diagnóstico y plan de medidas",M,y);y+=6;
+  doc.setFont("helvetica","normal");doc.setFontSize(10);doc.setTextColor(...gris);doc.text("Protección de datos personales · "+LEY,M,y);y+=7;doc.setTextColor(0);
+  doc.autoTable({startY:y,theme:"plain",margin:{left:M,right:M},styles:{fontSize:10,cellPadding:1.4},columnStyles:{0:{fontStyle:"bold",cellWidth:46}},
+    body:[["Empresa",e.razon||"—"],["RUT",e.rut||"—"],["Rubro",e.rubro||"—"],["Tamaño",e.tamano||"—"],["Encargado de datos",e.responsable||"No designado"],["Encuesta respondida por",e.rol||"—"],["Fecha de emisión",fmt(hoy())]]});
+  y=doc.lastAutoTable.finalY+7;
+  const col={ok:[31,157,87],warn:[217,127,6],bad:[214,58,44],info:NAVY}[s.nivel];
+  doc.setFillColor(...col);doc.roundedRect(M,y,W-2*M,17,3,3,"F");doc.setTextColor(255);doc.setFont("helvetica","bold");doc.setFontSize(14);
+  doc.text(`Cumplimiento estimado: ${s.pct}%  ·  ${s.nivelTxt}`,M+5,y+11);doc.setTextColor(0);y+=23;
+  doc.setFont("helvetica","normal");doc.setFontSize(9);doc.setTextColor(...gris);
+  doc.text(doc.splitTextToSize(`Preguntas respondidas: ${s.resp} de ${Q.length}. Medidas identificadas: ${s.med.length} (${s.med.filter(m=>m.prio==="alta").length} urgentes). Medidas corregidas: ${s.hechas}.`,W-2*M),M,y);doc.setTextColor(0);y+=9;
+  const h2=t=>{if(y>262){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.setFontSize(13);doc.setTextColor(...blue);doc.text(t,M,y);doc.setTextColor(0);y+=3};
+  if(d.resumen){h2("Resumen ejecutivo");y+=4;doc.setFont("helvetica","normal");doc.setFontSize(10);for(const l of doc.splitTextToSize(d.resumen,W-2*M)){if(y>282){doc.addPage();y=18}doc.text(l,M,y);y+=4.6}y+=5}
+  h2("Resultado por área");
+  doc.autoTable({startY:y,margin:{left:M,right:M},headStyles:{fillColor:blue},styles:{fontSize:10},head:[["Área","Puntaje","%"]],body:s.areas.map(a=>[a.name,`${a.p} de ${a.max}`,a.pct+"%"])});
+  y=doc.lastAutoTable.finalY+9;
+  h2("Medidas que debe tomar la empresa");
+  doc.autoTable({startY:y,margin:{left:M,right:M},headStyles:{fillColor:blue},styles:{fontSize:8.5,cellPadding:2,valign:"top"},
+    columnStyles:{0:{cellWidth:7},1:{cellWidth:36},2:{cellWidth:"auto"},3:{cellWidth:28},4:{cellWidth:20},5:{cellWidth:19}},
+    head:[["#","Hallazgo","Medida correctiva","Referencia legal","Plazo","Estado"]],
+    body:s.med.length?s.med.map((m,i)=>[i+1,m.h,m.c+"\n"+m.m,REF[m.ref].art,fmt(pISO(m.vence)),m.estado]):[["—","Sin hallazgos","","","",""]],
+    didParseCell:c=>{if(c.section!=="body")return;const m=s.med[c.row.index];if(!m)return;
+      if(c.column.index===4){c.cell.styles.textColor=m.prio==="alta"?[200,40,30]:[190,110,0];c.cell.styles.fontStyle="bold"}
+      if(c.column.index===5&&m.hecha)c.cell.styles.textColor=[30,140,60]}});
+  y=doc.lastAutoTable.finalY+9;
+  h2("Respuestas de la encuesta");
+  doc.autoTable({startY:y,margin:{left:M,right:M},headStyles:{fillColor:blue},styles:{fontSize:8.5,cellPadding:2,valign:"top"},columnStyles:{2:{cellWidth:18}},
+    head:[["Pregunta","Respuesta","Puntaje"]],
+    body:Q.map(q=>{const a=d.enc[q.id],r=evalQ(q,a);const txt=a===undefined||(Array.isArray(a)&&!a.length)?"Sin responder":q.multi?a.map(i=>q.o[i][0]).join("; "):q.o[a][0];return [q.t,txt,r?`${r.pts}/3`:"—"]})});
+  y=doc.lastAutoTable.finalY+9;
+  if(d.inventario.length){h2("Inventario de tratamientos");
+    doc.autoTable({startY:y,margin:{left:M,right:M},headStyles:{fillColor:blue},styles:{fontSize:8.5,cellPadding:2},head:[["Tratamiento","Titulares","Base legal","Conservación","Fuera de Chile"]],
+      body:d.inventario.map(i=>[i.nombre,i.titulares,i.base,i.conservacion||"Sin definir",i.extranjero])});y=doc.lastAutoTable.finalY+9}
+  if(y>262){doc.addPage();y=18}
+  doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.setTextColor(...gris);
+  doc.text(doc.splitTextToSize(`Nota: informe de orientación generado con la app Pyme en Regla a partir de las respuestas entregadas por la empresa. Las referencias corresponden a la ${LEY}, con entrada en vigencia fijada para el 1 de diciembre de 2026. Los plazos de 30 y 90 días son sugeridos para planificar las medidas y no son plazos legales. Verifique el texto vigente en www.bcn.cl/leychile. Este documento no constituye asesoría legal.`,W-2*M),M,y);
+  pdfFooter(doc,e,"Diagnóstico");
+  const name=`Informe Ley 21.719 - ${(e.razon||"empresa").replace(/[\\/:*?"<>|]/g,"")} - ${iso()}.pdf`;
+  try{await DL.save({filename:name,data:doc.output("blob")});toast("Informe listo.");Ads.inter()}
+  catch(err){if(err&&err.code==="declined")return;if(err&&err.code==="rate_limited"){toast("Ya hay una descarga en curso.");return}toast("No se pudo descargar el informe.")}
+}
+
+// ---------- Seguimiento ----------
+function vSeg(){
+  const d=D(),s=score(),al=alertas();
+  if(!s.resp) return `<div class="intro"><p>El tablero se activa al terminar la encuesta: cada brecha detectada pasa a seguimiento con su plazo.</p><button type="button" class="btn" data-go="encuesta">Ir a la encuesta</button></div>`;
+  const tot=s.med.length,cor=s.hechas,cur=s.med.filter(m=>m.estado==="En curso").length,pen=s.med.filter(m=>m.estado==="Pendiente").length;
+  const ven=s.med.filter(m=>m.alerta==="bad").length,pv=s.med.filter(m=>m.alerta==="warn").length;
+  const av=tot?Math.round(cor*100/tot):100;
+  const nRes=s.med.reduce((n,m)=>n+m.respaldos.length,0);
+  const filt={Activas:m=>m.estado!=="Corregida",Vencidas:m=>m.alerta==="bad",Corregidas:m=>m.estado==="Corregida",Todas:()=>true}[segFiltro];
+  const lista=s.med.filter(filt).sort((a,b)=>(a.estado==="Corregida")-(b.estado==="Corregida")||a.dl-b.dl);
+  const dot=c=>`<i class="dot" style="background:var(--${c})"></i>`;
+  return `
+  <div class="hero">${ring(av,av>=80?"ok":av>=40?"warn":"bad")}<div class="main"><h2>Avance de correcciones</h2><p>${cor} de ${tot} brechas corregidas</p>
+    <p class="small">Cumplimiento: ${s.pct}% al diagnóstico${d.fechaDiag?` (${fmt(pISO(d.fechaDiag))})`:""} → <b style="color:var(--ink)">${s.pctAct}% hoy</b></p></div></div>
+  <div class="tiles">
+    <button type="button" class="tile" data-filtro="Vencidas"><b style="color:${ven?"var(--red)":"inherit"}">${ven}</b><span>${dot(ven?"red":"green")}vencidas</span></button>
+    <button type="button" class="tile" data-filtro="Activas"><b>${pv}</b><span>${dot(pv?"orange":"green")}vencen en 7 días</span></button>
+    <button type="button" class="tile" data-filtro="Activas"><b>${pen+cur}</b><span>${dot("blue")}por corregir${cur?` · ${cur} en curso`:""}</span></button>
+    <button type="button" class="tile" data-filtro="Corregidas"><b style="color:var(--green)">${cor}</b><span>${dot("green")}corregidas · ${nRes} respaldos</span></button>
+  </div>
+  <div class="section"><button type="button" class="btn" data-act="pdfestado" ${DL?"":"disabled"}>Emitir informe de estado actual</button>${DL?"":`<div class="sfoot">La descarga solo está disponible al abrir la app en claude.ai.</div>`}</div>
+  <div class="section"><div class="shead">Alertas (${al.length})</div><div class="group">
+    ${al.length?al.slice(0,8).map(a=>`<button type="button" class="cell" ${a.b?`data-brecha="${a.b}"`:a.go?`data-go="registros" data-seg="${a.go}"`:`data-go="${a.tab}"`}><span class="dot" style="width:10px;height:10px;border-radius:50%;flex:none;background:var(--${a.n==="bad"?"red":a.n==="warn"?"orange":"blue"})"></span><div class="main"><span class="title" style="font-size:15px">${esc(a.t)}</span></div><span class="chev">›</span></button>`).join(""):`<div class="cell"><span style="color:var(--green);font-weight:700">✓</span><div class="main"><span class="title">Sin alertas</span></div></div>`}
+    ${al.length>8?`<div class="cell"><div class="main"><span class="subtitle">Y ${al.length-8} alertas más en el informe de estado.</span></div></div>`:""}
+  </div></div>
+  <div class="seg wide" role="group" aria-label="Filtro">${["Activas","Vencidas","Corregidas","Todas"].map(f=>`<button type="button" data-filtro="${f}" aria-pressed="${segFiltro===f}">${f}</button>`).join("")}</div>
+  <div class="section"><div class="shead">Brechas · ${lista.length}</div><div class="group">
+    ${lista.length?lista.map(m=>`<button type="button" class="cell" data-brecha="${m.id}"><div class="main"><span class="title">${esc(m.c)}</span><span class="subtitle">${m.responsable?esc(m.responsable):"Sin responsable"} · ${m.respaldos.length} respaldo${m.respaldos.length===1?"":"s"}</span><div class="pills">${estadoPill(m.estado)}${plazoPill(m)}</div></div><span class="chev">›</span></button>`).join(""):`<div class="empty">${segFiltro==="Vencidas"?"No hay brechas vencidas.":segFiltro==="Corregidas"?"Aún no hay brechas corregidas.":"No hay brechas en esta vista."}</div>`}
+  </div><div class="sfoot">Para marcar una brecha como corregida, adjunta al menos un respaldo: foto, PDF o una nota con la evidencia.</div></div>`;
+}
+function abrirBrecha(id){
+  const s=score(),m=s.med.find(x=>x.id===id);if(!m){toast("Esta brecha ya no aparece en el diagnóstico.");return}
+  ctx={type:"brecha",id};
+  const resp=m.respaldos.map(r=>`<div class="cell">${r.tipo==="archivo"&&/^image\//.test(r.contentType||"")?`<img data-blob="${esc(r.assetId)}" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:6px;flex:none">`:`<span class="ico" style="background:${r.tipo==="nota"?"#8e8e93":"var(--blue)"}">${I.shield}</span>`}
+    <div class="main"><span class="title" style="font-size:15px">${r.tipo==="archivo"?`<button type="button" class="iconbtn" style="padding:0;font-size:15px" data-openblob="${esc(r.assetId)}" data-nombre="${esc(r.nombre)}">${esc(r.nombre)}</button>`:esc(r.nombre)}</span><span class="subtitle">${fmt(new Date(r.fecha))}${r.texto?" · "+esc(r.texto):""}</span></div>
+    <button type="button" class="iconbtn" style="color:var(--red)" data-delresp="${r.id}" aria-label="Quitar respaldo">Quitar</button></div>`).join("");
+  openSheet("Brecha",`
+  <div class="group"><div class="cell"><div class="main"><span class="refart">${esc(m.area)} · prioridad ${m.prio}</span><span class="title" style="font-size:20px;font-weight:700">${esc(m.c)}</span><div class="pills">${estadoPill(m.estado)}${plazoPill(m)}</div></div></div>
+    <div class="cell"><div class="main"><span class="small" style="text-transform:uppercase;letter-spacing:.03em">Qué hacer</span><span class="title" style="font-size:16px">${esc(m.m)}</span></div></div>
+    <div class="cell"><div class="main"><span class="small" style="text-transform:uppercase;letter-spacing:.03em">Por qué</span><span class="subtitle">${esc(m.h)}</span></div></div>
+    <div class="cell"><div class="main"><span class="small" style="text-transform:uppercase;letter-spacing:.03em">Qué dice la ley</span><span class="refart" style="font-size:15px">${esc(REF[m.ref].art)}</span></div>${infoBtn(m.ref)}</div></div>
+  <div class="section"><div class="shead">Seguimiento</div><div class="group">
+    <div class="field"><label for="b_estado">Estado</label><select id="b_estado" name="estado">${ESTADOS.map(e=>`<option ${e===m.estado?"selected":""}>${e}</option>`).join("")}</select></div>
+    <div class="field"><label for="b_resp">Responsable</label><input id="b_resp" name="responsable" value="${esc(m.responsable)}" placeholder="Nombre o cargo"></div>
+    <div class="field"><label for="b_vence">Plazo</label><input id="b_vence" name="vence" type="date" value="${esc(m.vence)}" required></div>
+    <div class="field stack"><label for="b_nota">Nota de avance</label><textarea id="b_nota" name="nota" placeholder="Opcional: qué se hizo hoy"></textarea></div>
+  </div><div class="sfoot">Plazo sugerido: ${m.plazo} desde el diagnóstico. Puedes ajustarlo.</div></div>
+  <div class="section"><div class="shead">Respaldos (${m.respaldos.length})</div><div class="group">
+    ${resp||`<div class="empty">Sin respaldos. Adjunta la evidencia de la corrección.</div>`}
+    ${ASSETS?`<label class="cell" style="color:var(--blue);cursor:pointer;justify-content:center;gap:6px" for="b_file">${I.clip} Adjuntar foto o PDF</label><input id="b_file" type="file" accept="image/*,application/pdf" class="hidden">`:""}
+    <button type="button" class="cell" data-act="notaresp" style="color:var(--blue);justify-content:center">Agregar respaldo escrito</button>
+  </div><div class="sfoot">${ASSETS?"Imágenes y PDF de hasta 20 MB; se guardan solo en este teléfono. ":"En esta vista no se pueden adjuntar archivos; usa un respaldo escrito con la descripción o el enlace. "}Ejemplos: política publicada, contrato firmado, captura de la doble verificación, acta de capacitación.</div></div>
+  ${m.historial.length?`<div class="section"><div class="shead">Historial</div><div class="group">${m.historial.slice().reverse().map(x=>`<div class="cell"><div class="main"><span class="subtitle" style="color:var(--ink)">${esc(x.t)}</span><span class="small">${fmt(new Date(x.f))}</span></div></div>`).join("")}</div></div>`:""}`,{right:"Guardar"});
+  const fi=document.getElementById("b_file");if(fi)fi.addEventListener("change",()=>subirRespaldo(id,fi));
+  hidratar(sf);
+}
+function bstore(id){const d=D();return d.brechas[id]||(d.brechas[id]={estado:brecha(d,score().med.find(x=>x.id===id)).estado,respaldos:[],historial:[]})}
+function hist(b,t){(b.historial=b.historial||[]).push({f:new Date().toISOString(),t})}
+async function subirRespaldo(id,fi){
+  const f=fi.files&&fi.files[0];if(!f)return;
+  toast("Subiendo respaldo…");
+  try{const r=await ASSETS.upload(f);const b=bstore(id);(b.respaldos=b.respaldos||[]).push({id:uid(),tipo:"archivo",nombre:f.name,assetId:r.id,contentType:r.contentType,fecha:new Date().toISOString()});
+    if(!b.estado||b.estado==="Pendiente")b.estado="En curso";hist(b,`Respaldo adjunto: ${f.name}`);saveD();abrirBrecha(id);render();toast("Respaldo adjunto.")}
+  catch(e){const c=e&&e.code;toast(c==="too_large"?"El archivo supera 20 MB.":c==="unsupported_type"?"Formato no admitido. Usa una imagen o un PDF.":c==="quota_or_state"?"No queda espacio para más archivos.":"No se pudo subir el respaldo. Inténtalo de nuevo.")}
+}
+function notaRespaldo(id){
+  ctx={type:"notaresp",id};
+  openSheet("Respaldo escrito",`<div class="group"><div class="field"><label for="n_nom">Título</label><input id="n_nom" name="nombre" required placeholder="Ej.: Política publicada en la web"></div>
+  <div class="field stack"><label for="n_txt">Descripción o enlace</label><textarea id="n_txt" name="texto" placeholder="Qué se hizo, dónde está el documento o el enlace"></textarea></div></div>`,{right:"Agregar"});
+}
+
+async function pdfEstado(){
+  if(!DL){toast("La descarga no está disponible en esta vista.");return}
+  if(!window.jspdf){toast("No se pudo cargar el generador de PDF. Recarga la página.");return}
+  const {jsPDF}=window.jspdf,doc=new jsPDF({unit:"mm",format:"a4"});
+  const d=D(),s=score(),e=E(),al=alertas(),W=210,M=16;let y=18;const blue=NAVY,gris=[110,110,115];
+  const tot=s.med.length,cor=s.hechas,av=tot?Math.round(cor*100/tot):100;
+  y=await pdfHeader(doc,"INFORME DE ESTADO","Fecha de corte "+fmt(hoy()));
+  doc.setFont("helvetica","bold");doc.setFontSize(17);doc.setTextColor(...NAVY);doc.text("Estado de avance de las correcciones",M,y);y+=6;
+  doc.setFont("helvetica","normal");doc.setFontSize(10);doc.setTextColor(...gris);doc.text("Corrección de brechas · "+LEY,M,y);y+=7;doc.setTextColor(0);
+  doc.autoTable({startY:y,theme:"plain",margin:{left:M,right:M},styles:{fontSize:10,cellPadding:1.4},columnStyles:{0:{fontStyle:"bold",cellWidth:50}},
+    body:[["Empresa",e.razon||"—"],["RUT",e.rut||"—"],["Encargado de datos",e.responsable||"No designado"],["Fecha del diagnóstico",d.fechaDiag?fmt(pISO(d.fechaDiag)):"—"],["Fecha de corte",fmt(hoy())],["Entrada en vigencia de la ley","01-12-2026"]]});
+  y=doc.lastAutoTable.finalY+7;
+  const col=av>=80?[31,157,87]:av>=40?[217,127,6]:[214,58,44];
+  doc.setFillColor(...col);doc.roundedRect(M,y,W-2*M,17,3,3,"F");doc.setTextColor(255);doc.setFont("helvetica","bold");doc.setFontSize(14);
+  doc.text(`Avance: ${av}% (${cor} de ${tot} brechas corregidas)`,M+5,y+11);doc.setTextColor(0);y+=24;
+  const ven=s.med.filter(m=>m.alerta==="bad").length,pv=s.med.filter(m=>m.alerta==="warn").length;
+  doc.autoTable({startY:y,margin:{left:M,right:M},headStyles:{fillColor:blue},styles:{fontSize:10,halign:"center"},
+    head:[["Cumplimiento al diagnóstico","Cumplimiento actual","Corregidas","En curso","Pendientes","Vencidas","Vencen en 7 días"]],
+    body:[[s.pct+"%",s.pctAct+"%",cor,s.med.filter(m=>m.estado==="En curso").length,s.med.filter(m=>m.estado==="Pendiente").length,ven,pv]]});
+  y=doc.lastAutoTable.finalY+9;
+  const h2=t=>{if(y>262){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.setFontSize(13);doc.setTextColor(...blue);doc.text(t,M,y);doc.setTextColor(0);y+=3};
+  h2("Alertas vigentes");
+  doc.autoTable({startY:y,margin:{left:M,right:M},headStyles:{fillColor:blue},styles:{fontSize:9},columnStyles:{0:{cellWidth:22}},head:[["Nivel","Alerta"]],
+    body:al.length?al.map(a=>[a.n==="bad"?"Crítica":a.n==="warn"?"Atención":"Aviso",a.t]):[["—","Sin alertas"]],
+    didParseCell:c=>{if(c.section==="body"&&c.column.index===0){c.cell.styles.fontStyle="bold";c.cell.styles.textColor=c.cell.raw==="Crítica"?[200,40,30]:c.cell.raw==="Atención"?[190,110,0]:blue}}});
+  y=doc.lastAutoTable.finalY+9;
+  const pend=s.med.filter(m=>m.estado!=="Corregida").sort((a,b)=>a.dl-b.dl);
+  h2("Qué falta: brechas por corregir");
+  doc.autoTable({startY:y,margin:{left:M,right:M},headStyles:{fillColor:blue},styles:{fontSize:8.5,cellPadding:2,valign:"top"},
+    columnStyles:{0:{cellWidth:7},1:{cellWidth:"auto"},2:{cellWidth:28},3:{cellWidth:20},4:{cellWidth:22},5:{cellWidth:18}},
+    head:[["#","Medida","Responsable","Plazo","Situación","Estado"]],
+    body:pend.length?pend.map((m,i)=>[i+1,m.c,m.responsable||"Sin asignar",fmt(pISO(m.vence)),m.dl<0?`Vencida (${-m.dl} d)`:`Quedan ${m.dl} d`,m.estado]):[["—","Todas las brechas están corregidas","","","",""]],
+    didParseCell:c=>{if(c.section==="body"&&c.column.index===4&&/Vencida/.test(c.cell.raw)){c.cell.styles.textColor=[200,40,30];c.cell.styles.fontStyle="bold"}}});
+  y=doc.lastAutoTable.finalY+9;
+  const corr=s.med.filter(m=>m.estado==="Corregida");
+  h2("Brechas corregidas y respaldos");
+  doc.autoTable({startY:y,margin:{left:M,right:M},headStyles:{fillColor:blue},styles:{fontSize:8.5,cellPadding:2,valign:"top"},columnStyles:{0:{cellWidth:7},2:{cellWidth:28},3:{cellWidth:60}},
+    head:[["#","Medida","Responsable","Respaldos"]],
+    body:corr.length?corr.map((m,i)=>[i+1,m.c,m.responsable||"—",m.respaldos.map(r=>`${r.nombre} (${fmt(new Date(r.fecha))})`).join("\n")]):[["—","Aún no hay brechas corregidas","",""]]});
+  y=doc.lastAutoTable.finalY+9;
+  const cur=pend.filter(m=>m.respaldos.length);
+  if(cur.length){h2("Respaldos de brechas en curso");
+    doc.autoTable({startY:y,margin:{left:M,right:M},headStyles:{fillColor:blue},styles:{fontSize:8.5,cellPadding:2,valign:"top"},columnStyles:{1:{cellWidth:70}},head:[["Medida","Respaldos"]],
+      body:cur.map(m=>[m.c,m.respaldos.map(r=>`${r.nombre} (${fmt(new Date(r.fecha))})`).join("\n")])});y=doc.lastAutoTable.finalY+9}
+  if(y>262){doc.addPage();y=18}
+  doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.setTextColor(...gris);
+  doc.text(doc.splitTextToSize(`Nota: el cumplimiento actual considera como cumplidas las brechas marcadas como corregidas con respaldo. Los plazos son definidos por la empresa a partir de una sugerencia de 30 días (prioridad alta) y 90 días (prioridad media) y no son plazos legales. Referencias: ${LEY}. Este documento no constituye asesoría legal.`,W-2*M),M,y);
+  pdfFooter(doc,e,"Estado de avance");
+  try{await DL.save({filename:`Estado de avance Ley 21.719 - ${(e.razon||"empresa").replace(/[\\/:*?"<>|]/g,"")} - ${iso()}.pdf`,data:doc.output("blob")});toast("Informe de estado listo.");Ads.inter()}
+  catch(err){if(err&&err.code==="declined")return;if(err&&err.code==="rate_limited"){toast("Ya hay una descarga en curso.");return}toast("No se pudo descargar el informe.")}
+}
+
+// ---------- Registros ----------
+function venc(s){const r=pISO(s.recibida);if(!r)return null;const v=new Date(r);v.setDate(v.getDate()+PLAZO*(s.estado==="Prorrogada"?2:1));return v}
+function cerrada(s){return s.estado==="Respondida"||s.estado==="Rechazada con fundamento"}
+function solPill(s){if(cerrada(s))return pill("ok",s.estado);const v=venc(s);if(!v)return pill("info",s.estado);const d=dias(hoy(),v);return d<0?pill("bad",`Vencida hace ${-d} d`):d<=7?pill("warn",`Vence en ${d} d`):pill("info",`Quedan ${d} d`)}
+function invObs(it){const a=[];if(it.base==="Sin definir")a.push(["bad","Sin base legal"]);if(it.sensibles==="Sí")a.push(["warn","Datos sensibles"]);if(!it.conservacion)a.push(["warn","Sin plazo de conservación"]);if(it.extranjero==="Sí")a.push(["info","Transferencia internacional"]);if(it.extranjero==="No sé")a.push(["warn","Ubicación desconocida"]);return a}
+function incObs(it){const a=[];a.push(it.estado==="Cerrado"?["ok","Cerrado"]:it.estado==="Abierto"?["bad","Abierto"]:["warn","Contenido"]);if(it.agencia==="No")a.push(["warn","Evaluar aviso a la Agencia"]);if(it.sensibles==="Sí"&&it.titulares!=="Sí")a.push(["bad","Informar a afectados"]);return a}
+function vReg(){
+  const items=D()[regSeg];
+  const intro={inventario:"Cada uso de datos personales que hace la empresa: qué datos, de quién, para qué y por cuánto tiempo.",solicitudes:"Plazo de respuesta: 30 días corridos desde la recepción; si la marcas como prorrogada, otros 30.",incidentes:"Registra toda vulneración de seguridad, aunque no se haya informado a la Agencia."}[regSeg];
+  const refx={inventario:"politica",solicitudes:"recibida",incidentes:"incidente"}[regSeg];
+  return `<div class="seg wide" role="group" aria-label="Tipo de registro">${[["inventario","Inventario"],["solicitudes","Solicitudes"],["incidentes","Incidentes"]].map(([k,n])=>`<button type="button" data-seg="${k}" aria-pressed="${regSeg===k}">${n}</button>`).join("")}</div>
+  <div class="section"><div class="group"><div class="cell"><div class="main"><span class="subtitle">${intro}</span></div>${infoBtn(refx)}</div></div></div>
+  <div class="section"><div class="shead">${items.length} registros</div><div class="group">${items.length?items.map(it=>cellReg(regSeg,it)).join(""):`<div class="empty">Sin registros. Toca + para agregar.</div>`}</div></div>
+  <button type="button" class="btn tinted" data-add="${regSeg}">Agregar ${SPECS[regSeg].title.toLowerCase()}</button>`;
+}
+function cellReg(k,it){
+  let t,sub,p="";
+  if(k==="inventario"){t=it.nombre;sub=`${it.titulares} · ${it.base}`;const o=invObs(it);p=o.length?o.map(x=>pill(x[0],x[1])).join(""):pill("ok","Completo")}
+  if(k==="solicitudes"){t=`${it.derecho} · ${it.titular}`;sub=`Recibida ${fmt(pISO(it.recibida))} · vence ${fmt(venc(it))}`;p=solPill(it)}
+  if(k==="incidentes"){t=it.descripcion;sub=`Detectado ${fmt(pISO(it.fecha))}${it.afectados?` · ${it.afectados} afectados`:""}`;p=incObs(it).map(x=>pill(x[0],x[1])).join("")}
+  return `<button type="button" class="cell" data-edit="${k}" data-id="${it.id}"><div class="main"><span class="title">${esc(t)}</span><span class="subtitle">${esc(sub)}</span><div class="pills">${p}</div></div><span class="chev">›</span></button>`;
+}
+
+// ---------- Documentos ----------
+function vDocs(){
+  const d=D();
+  return `<div class="section"><div class="shead">Generar</div><div class="group">
+  ${DOCS.map(x=>`<button type="button" class="cell icon" data-gen="${x.id}"><span class="ico">${I.docw}</span><div class="main"><span class="title">${x.name}</span><span class="subtitle">${x.d}</span></div><span class="chev">›</span></button>`).join("")}
+  </div><div class="sfoot">${SAMPLE?"Claude redacta un borrador con los datos de la empresa, la encuesta y el inventario.":"Se genera una plantilla con los datos de la empresa."} Revísalo con un abogado antes de usarlo.</div></div>
+  ${SAMPLE?`<div class="section"><div class="shead">Consulta sobre la ley</div><div class="group"><div class="field stack"><label for="qq">Tu pregunta</label><textarea id="qq" placeholder="¿Puedo seguir usando el reloj de huella para la asistencia?"></textarea></div></div><button type="button" class="btn tinted" data-act="preguntar">Preguntar</button><div id="ans"></div></div>`:""}
+  <div class="section"><div class="shead">Guardados</div><div class="group">
+  ${d.documentos.length?d.documentos.map(x=>`<button type="button" class="cell" data-ver="${x.id}"><div class="main"><span class="title">${esc(x.nombre)}</span><span class="subtitle">${fmt(new Date(x.fecha))}</span></div><span class="chev">›</span></button>`).join(""):`<div class="empty">Aún no hay documentos.</div>`}
+  </div></div>`;
+}
+function contexto(){
+  const e=E(),d=D(),s=score();
+  return `EMPRESA: ${e.razon||"[COMPLETAR]"}, RUT ${e.rut||"[COMPLETAR]"}, rubro ${e.rubro||"[COMPLETAR]"}, ${e.tamano||""}, dirección ${e.direccion||"[COMPLETAR]"}, web ${e.web||"[COMPLETAR]"}, correo de privacidad ${e.correo||"[COMPLETAR]"}, encargado de datos ${e.responsable||"[COMPLETAR]"}.
+RESPUESTAS DE LA ENCUESTA:\n${Q.map(q=>{const a=d.enc[q.id];if(a===undefined)return null;return `- ${q.t} → ${q.multi?a.map(i=>q.o[i][0]).join("; "):q.o[a][0]}`}).filter(Boolean).join("\n")}
+INVENTARIO:\n${d.inventario.map(i=>`- ${i.nombre}: titulares ${i.titulares}; datos ${i.datos}; sensibles ${i.sensibles}; finalidad ${i.finalidad}; base ${i.base}; conservación ${i.conservacion||"sin definir"}; acceso ${i.acceso}; fuera de Chile ${i.extranjero}`).join("\n")||"(sin registrar)"}`;
+}
+function plantilla(id){
+  const e=E(),d=D(),R=e.razon||"[RAZÓN SOCIAL]",C=e.correo||"[CORREO DE PRIVACIDAD]",RS=e.responsable||"[ENCARGADO DE DATOS]";
+  return ({
+    politica:`POLÍTICA DE PRIVACIDAD DE ${R.toUpperCase()}\n\n1. RESPONSABLE\n${R}, RUT ${e.rut||"[RUT]"}, domiciliada en ${e.direccion||"[DIRECCIÓN]"}, es responsable del tratamiento de los datos personales descritos en esta política, conforme a la ${LEY}.\n\n2. DATOS QUE TRATAMOS, FINALIDAD Y BASE LEGAL\n${d.inventario.map(i=>`- ${i.titulares}: ${i.datos}. Finalidad: ${i.finalidad}. Base legal: ${i.base}. Conservación: ${i.conservacion||"[PLAZO]"}.`).join("\n")||"- [COMPLETAR según el inventario]"}\n\n3. COMUNICACIÓN A TERCEROS\nSolo a proveedores que prestan servicios bajo contrato y obligación de confidencialidad, y a autoridades cuando la ley lo exija.\n\n4. TRANSFERENCIA INTERNACIONAL\n[Indicar servicios ubicados fuera de Chile y las garantías aplicables.]\n\n5. DERECHOS\nPuedes ejercer los derechos de acceso, rectificación, supresión, oposición, portabilidad y bloqueo escribiendo a ${C}. Responderemos dentro de 30 días corridos.\n\n6. SEGURIDAD\nAplicamos medidas técnicas y organizativas para proteger los datos.\n\nÚltima actualización: ${fmt(hoy())}`,
+    consentimiento:`CLÁUSULA DE CONSENTIMIENTO\n\nAutorizo a ${R} a tratar mis datos de contacto (nombre, correo y teléfono) para enviarme información comercial. Sé que este consentimiento es voluntario, que puedo retirarlo en cualquier momento escribiendo a ${C} y que puedo ejercer mis derechos de acceso, rectificación, supresión, oposición, portabilidad y bloqueo.\n\n[ ] Acepto`,
+    trabajadores:`ANEXO DE PROTECCIÓN DE DATOS PERSONALES\n\n1. ${R} tratará los datos personales del trabajador para gestionar la relación laboral, pagar remuneraciones y cumplir obligaciones legales.\n2. El trabajador guardará secreto sobre los datos personales a los que acceda, durante y después de la relación laboral.\n3. Se prohíbe copiar bases de datos a dispositivos personales e ingresar datos personales en herramientas de inteligencia artificial no autorizadas.\n4. Toda pérdida o filtración de datos debe informarse de inmediato a ${RS}.\n5. El trabajador puede ejercer sus derechos escribiendo a ${C}.`,
+    encargado:`CLÁUSULA DE ENCARGO DE TRATAMIENTO\n\nEl Proveedor tratará los datos personales que reciba de ${R} solo para prestar los servicios contratados y según sus instrucciones. Se obliga a: (a) guardar confidencialidad; (b) aplicar medidas de seguridad adecuadas; (c) no comunicarlos a terceros sin autorización; (d) avisar sin demora de cualquier vulneración de seguridad; y (e) devolverlos o eliminarlos al término del contrato.`,
+    incidentes:`PROCEDIMIENTO ANTE FILTRACIONES DE DATOS\n\n1. Detectar y avisar de inmediato a ${RS}.\n2. Contener: cambiar claves, bloquear accesos y aislar equipos.\n3. Evaluar datos afectados, número de personas y riesgo.\n4. Informar a la Agencia de Protección de Datos Personales sin dilaciones indebidas cuando exista riesgo razonable para los titulares.\n5. Informar a los afectados si hay datos sensibles, de menores o financieros.\n6. Registrar el incidente y las medidas en Pyme en Regla.\n7. Corregir la causa y revisar el procedimiento.`,
+    camaras:`ZONA VIDEOVIGILADA\n\n${R} graba imágenes con fines de seguridad.\nLas grabaciones se conservan por [PLAZO] y luego se eliminan.\nPara ejercer tus derechos escribe a ${C}.`
+  })[id];
+}
+const PROMPTS={politica:"una política de privacidad completa para su web y su local",consentimiento:"una cláusula de consentimiento breve para formularios y comunicaciones comerciales",trabajadores:"un anexo de contrato de trabajo sobre protección de datos personales, con deber de secreto y reglas de uso de herramientas de IA",encargado:"una cláusula contractual de encargado de tratamiento para proveedores que manejan sus datos",incidentes:"un procedimiento interno paso a paso ante vulneraciones de seguridad de datos personales",camaras:"el texto de un letrero breve de zona videovigilada"};
+let ctrl=null;
+async function generar(id){
+  const x=DOCS.find(d=>d.id===id);
+  openSheet(x.name,`<div class="group"><div class="doc" id="gtxt">${SAMPLE?"Redactando…":""}</div></div><div class="sfoot">${REF[x.ref].art}. Borrador para revisar con un abogado.</div>`,{left:"Cerrar"});
+  const box=document.getElementById("gtxt");let texto="";
+  if(SAMPLE){
+    if(ctrl)ctrl.abort();ctrl=new AbortController();
+    try{const r=await SAMPLE(`Eres un abogado chileno experto en protección de datos personales (${LEY}, vigente desde el 1 de diciembre de 2026). Redacta ${PROMPTS[id]} para esta pyme.\n\n${contexto()}\n\nReglas: español de Chile y lenguaje claro; texto plano sin markdown, títulos en MAYÚSCULAS y listas con guiones; usa solo los datos entregados y escribe [COMPLETAR] donde falte información; no cites números de artículos de los que no estés seguro; cierra con una línea que indique que es un borrador para revisar con un abogado.`,{signal:ctrl.signal,modelTier:"default",onText:({text})=>{if(box)box.textContent=text}});texto=r.text}
+    catch(e){if(e&&e.name==="AbortError")return;if(e&&e.code==="not_granted")SAMPLE=null;texto=plantilla(id);toast("No se pudo redactar con IA. Se usó la plantilla base.")}
+  } else texto=plantilla(id);
+  if(box)box.textContent=texto;
+  const doc={id:uid(),tipo:id,nombre:x.name,fecha:new Date().toISOString(),texto};
+  D().documentos.unshift(doc);saveD();
+  if(sheet.open){sf.querySelector(".sheetbody").insertAdjacentHTML("beforeend",docActions(doc.id,false))}
+  if(tab==="documentos")render();
+}
+function docActions(id,del=true){return `<div class="group"><button type="button" class="cell" data-copy="${id}" style="color:var(--blue);justify-content:center">Copiar texto</button>${DL?`<button type="button" class="cell" data-dldoc="${id}" style="color:var(--blue);justify-content:center">Descargar (.txt)</button>`:""}${del?`<button type="button" class="cell" data-deldoc="${id}" style="color:var(--red);justify-content:center">Eliminar</button>`:""}</div>`}
+async function preguntar(){
+  const el=document.getElementById("qq"),q=el?el.value.trim():"",ans=document.getElementById("ans");if(!q||!SAMPLE)return;
+  ans.innerHTML=`<div class="group"><div class="doc" id="atxt">Pensando…</div></div>`;const box=document.getElementById("atxt");
+  try{const r=await SAMPLE(`Responde en español de Chile, en máximo 180 palabras y texto plano, la consulta de una pyme sobre la ${LEY}. Sé práctico y cita artículos solo si estás seguro. Si algo depende de normas aún no dictadas, dilo.\n\n${contexto()}\n\nPregunta: ${q}`,{modelTier:"default",onText:({text})=>{box.textContent=text}});box.textContent=r.text+"\n\nOrientación general, no asesoría legal."}
+  catch(e){box.textContent="No se pudo responder ahora. Inténtalo de nuevo en unos minutos."}
+}
+async function resumenIA(){
+  if(!SAMPLE)return;const s=score(),d=D(),box=document.getElementById("rtxt");box.style.color="";box.textContent="Redactando…";
+  const datos=`Cumplimiento ${s.pct}% (${s.nivelTxt}). Áreas: ${s.areas.map(a=>`${a.name} ${a.pct}%`).join("; ")}.\nMedidas urgentes: ${s.med.filter(m=>m.prio==="alta").map(m=>m.m).join(" | ")||"ninguna"}.\nMedidas a 90 días: ${s.med.filter(m=>m.prio==="media").map(m=>m.m).join(" | ")||"ninguna"}.\nFortalezas: ${s.ok.map(q=>q.t).join(" | ")||"ninguna"}.`;
+  try{const r=await SAMPLE(`Redacta un resumen ejecutivo para la gerencia de ${E().razon||"la empresa"} sobre su diagnóstico de cumplimiento de la ${LEY}. Máximo 170 palabras, texto plano, español de Chile, tono profesional y directo. Estructura: situación general en 2 frases; los 3 riesgos principales; y las acciones prioritarias de los próximos 30 días. No inventes datos.\n\n${datos}`,{modelTier:"default",onText:({text})=>{box.textContent=text}});
+    d.resumen=r.text.trim();saveD();render()}
+  catch(e){box.textContent="No se pudo redactar el resumen. Inténtalo de nuevo."}
+}
+
+// ================== Hojas ==================
+const sheet=document.getElementById("sheet"),sf=document.getElementById("sheetForm");
+let ctx=null;
+function openSheet(title,body,{left="Cancelar",right=null}={}){
+  sf.innerHTML=`<div class="sheethead"><div class="grabber"></div><div class="sheetbar"><button type="button" class="iconbtn" data-act="close">${left}</button><h2>${title}</h2>${right?`<button type="submit" class="iconbtn">${right}</button>`:`<span style="min-width:80px"></span>`}</div></div><div class="sheetbody">${body}</div>`;
+  if(!sheet.open)sheet.showModal();
+  Ads.banner(false);
+}
+function closeSheet(){if(sheet.open)sheet.close();ctx=null;Ads.sync()}
+sheet.addEventListener("close",()=>Ads.sync());
+sheet.addEventListener("click",ev=>{if(ev.target===sheet)closeSheet()});
+function fieldHTML(f,v){
+  const ctl=f.type==="select"?`<select id="f_${f.id}" name="${f.id}">${f.options.map(o=>`<option ${o===v?"selected":""}>${esc(o)}</option>`).join("")}</select>`
+    :f.type==="textarea"?`<textarea id="f_${f.id}" name="${f.id}" placeholder="Opcional">${esc(v)}</textarea>`
+    :`<input id="f_${f.id}" name="${f.id}" type="${f.type}" value="${esc(v)}" placeholder="${esc(f.ph||"")}" ${f.req?"required":""}>`;
+  return `<div class="field ${f.type==="textarea"?"stack":""}"><label for="f_${f.id}">${f.label}</label>${ctl}${infoBtn(f.ref)}</div>`;
+}
+function abrirRegistro(k,id){
+  const sp=SPECS[k],it=id?D()[k].find(x=>x.id===id):{};const v=Object.assign({},it);
+  if(!id&&k==="solicitudes")v.recibida=iso();if(!id&&k==="incidentes")v.fecha=iso();
+  ctx={type:"reg",k,id};
+  openSheet(id?sp.title:"Nuevo: "+sp.title.toLowerCase(),`<div class="group">${sp.fields.map(f=>fieldHTML(f,v[f.id]??"")).join("")}</div><div class="sfoot">Toca ⓘ para ver la referencia legal de cada dato.</div>${id?`<div class="group"><button type="button" class="cell" data-act="del" style="color:var(--red);justify-content:center">Eliminar</button></div>`:""}`,{right:"Guardar"});
+}
+function abrirPerfil(id){
+  const p=P.perfiles.find(x=>x.id===id);ctx={type:"perfil",id};
+  openSheet("Editar empresa",`<div class="group">${EMPRESA_FIELDS.map(f=>fieldHTML(f,p[f.id]??"")).join("")}</div>${P.perfiles.length>1?`<div class="group"><button type="button" class="cell" data-act="delperfil" style="color:var(--red);justify-content:center">Eliminar empresa</button></div>`:""}`,{right:"Guardar"});
+}
+function abrirPerfiles(){
+  ctx={type:"perfiles"};
+  openSheet("Empresas",`<div class="section"><div class="group">
+    ${P.perfiles.map(p=>{const s=DATA[p.id]?score(DATA[p.id]):null;return `<div class="cell icon"><span class="ico" style="background:var(--blue);font-size:12px;font-weight:700">${esc(initials(p.razon))}</span>
+      <button type="button" class="main" data-switch="${p.id}" style="border:0;background:none;text-align:left;cursor:pointer;padding:0"><span class="title">${esc(p.razon)}</span><span class="subtitle">${esc(p.rol||"")}${s&&s.resp?` · ${s.pct}%`:" · encuesta pendiente"}</span></button>
+      ${p.id===P.activo?`<span class="check">✓</span>`:""}<button type="button" class="iconbtn" data-editperfil="${p.id}">Editar</button></div>`}).join("")}
+    <button type="button" class="cell" data-act="nuevaempresa" style="color:var(--blue)">Agregar empresa y responder su encuesta</button>
+  </div><div class="sfoot">Cada empresa tiene su propia encuesta, informe, registros y documentos. Útil si asesoras a varias.</div></div>
+  <div class="section"><div class="shead">Acerca de</div><div class="group">
+    <div class="cell icon">${LOGO("about")}<div class="main"><span class="title">Pyme en Regla</span><span class="subtitle">Versión ${APP.version} · Creada por ${APP.creador}</span></div></div>
+    <div class="cell"><div class="main"><span class="title">Contacto</span><span class="subtitle" style="-webkit-user-select:text;user-select:text">${APP.correo}</span></div></div>
+    <a class="cell" href="${APP.privacidad}" data-ext="1" style="color:var(--blue);text-decoration:none">Política de privacidad</a>
+  </div><div class="sfoot">Herramienta de orientación sobre la ${LEY}. No reemplaza la asesoría de un abogado ni es un servicio oficial del Estado.</div></div>
+  <div class="section"><div class="shead">Copia de seguridad</div><div class="group"><button type="button" class="cell" data-act="exportar" style="color:var(--blue)">Exportar copia de seguridad</button><button type="button" class="cell" data-act="importar" style="color:var(--blue)">Restaurar desde una copia</button></div><div class="sfoot">Como los datos viven solo en este teléfono, guarda una copia antes de cambiar de equipo o desinstalar la app. Las fotos y PDF adjuntos no se incluyen en la copia.</div></div>
+  <div class="section"><div class="group"><button type="button" class="cell" data-act="borrartodo" style="color:var(--red);justify-content:center">Eliminar todos mis datos</button></div><div class="sfoot">${storeTxt()}. Esta acción borra todas las empresas, respuestas, registros, documentos y respaldos, y no se puede deshacer.</div></div>`,{left:"Cerrar"});
+}
+function abrirRef(r){
+  const x=REF[r];
+  openSheet("Qué dice la ley",`<div class="group"><div class="cell"><div class="main"><span class="refart">${esc(x.art)}</span><span class="reftext">${esc(x.t)}</span></div></div></div><div class="sfoot">${LEY}. Verifica el texto vigente en <a href="${LEYCHILE}" data-ext="1">LeyChile</a>.</div>`,{left:"Cerrar"});
+}
+function verDoc(id){const x=D().documentos.find(d=>d.id===id);ctx={type:"doc",id};openSheet(esc(x.nombre),`<div class="group"><div class="doc">${esc(x.texto)}</div></div>${docActions(id)}`,{left:"Cerrar"})}
+
+sf.addEventListener("submit",ev=>{
+  ev.preventDefault();if(!ctx)return;const data=Object.fromEntries(new FormData(sf).entries());
+  if(ctx.type==="reg"){const arr=D()[ctx.k];if(ctx.id)Object.assign(arr.find(x=>x.id===ctx.id),data);else arr.unshift({id:uid(),...data});saveD();closeSheet();render();return}
+  if(ctx.type==="perfil"){Object.assign(P.perfiles.find(x=>x.id===ctx.id),data);saveP();closeSheet();render();toast("Empresa actualizada.")}
+  if(ctx.type==="brecha"){
+    const id=ctx.id,b=bstore(id),prev=b.estado||"Pendiente",nres=(b.respaldos||[]).length;
+    if(data.estado==="Corregida"&&!nres){toast("Adjunta al menos un respaldo antes de marcarla como corregida.");return}
+    if(data.estado!==prev)hist(b,`Estado: ${prev} → ${data.estado}`);
+    if((b.responsable||"")!==data.responsable)hist(b,`Responsable: ${data.responsable||"sin asignar"}`);
+    if(b.vence&&b.vence!==data.vence)hist(b,`Plazo modificado al ${fmt(pISO(data.vence))}`);
+    if(data.nota&&data.nota.trim())hist(b,`Nota: ${data.nota.trim()}`);
+    b.estado=data.estado;b.responsable=data.responsable;b.vence=data.vence;saveD();closeSheet();render();toast(data.estado==="Corregida"?"Brecha corregida.":"Seguimiento guardado.");return}
+  if(ctx.type==="notaresp"){const id=ctx.id,b=bstore(id);(b.respaldos=b.respaldos||[]).push({id:uid(),tipo:"nota",nombre:data.nombre,texto:data.texto||"",fecha:new Date().toISOString()});
+    if(!b.estado||b.estado==="Pendiente")b.estado="En curso";hist(b,`Respaldo escrito: ${data.nombre}`);saveD();render();abrirBrecha(id);return}
+});
+// formulario de empresa dentro de la encuesta
+document.addEventListener("submit",ev=>{
+  if(ev.target.id!=="fEmp")return;ev.preventDefault();
+  const data=Object.fromEntries(new FormData(ev.target).entries());
+  if(P.activo){Object.assign(E(),data);saveP();D().paso=1;saveD()}
+  else{const id=uid();const nd=NEW?NEW.data:blankData();nd.paso=1;P.perfiles.push({id,...data});P.activo=id;DATA[id]=nd;NEW=null;saveP();saveD()}
+  render();window.scrollTo(0,0);
+});
+
+// ================== Eventos ==================
+document.addEventListener("click",async ev=>{
+  const a=ev.target.closest("a[data-ext]");if(a){ev.preventDefault();return abrirEnlace(a.href)}
+  const b=ev.target.closest("button");if(!b)return;const ds=b.dataset;
+  if(ds.openblob)return abrirArchivo(ds.openblob,ds.nombre);
+  if(ds.go==="informe"&&tab==="encuesta"&&D().paso>Q.length){await Ads.inter();return go("informe")}
+  if(ds.ref){ev.preventDefault();return abrirRef(ds.ref)}
+  if(ds.tab)return go(ds.tab);
+  if(ds.paso!==undefined){const n=+ds.paso;if(!P.activo&&n===0&&!NEW)NEW={emp:{},data:blankData()};if(!P.activo&&NEW)NEW.data.paso=n;return setPaso(n)}
+  if(ds.opt!==undefined)return elegir(ds.qid,+ds.opt);
+  if(ds.brecha){if(tab==="encuesta")go("seguimiento");return abrirBrecha(ds.brecha)}
+  if(ds.filtro){segFiltro=ds.filtro;return render()}
+  if(ds.delresp){if(b.dataset.c!=="1"){b.dataset.c="1";b.textContent="Confirmar";return}const id=ctx.id,bb=bstore(id),r=(bb.respaldos||[]).find(x=>x.id===ds.delresp);
+    bb.respaldos=bb.respaldos.filter(x=>x.id!==ds.delresp);hist(bb,`Respaldo quitado: ${r?r.nombre:""}`);if(bb.estado==="Corregida"&&!bb.respaldos.length){bb.estado="En curso";hist(bb,"Estado: Corregida → En curso (sin respaldos)")}
+    if(r&&r.assetId&&ASSETS){try{await ASSETS.delete(r.assetId)}catch(e){}}saveD();render();return abrirBrecha(id)}
+  if(ds.seg&&!ds.go){regSeg=ds.seg;return render()}
+  if(ds.go){if(ds.seg)regSeg=ds.seg;return go(ds.go)}
+  if(ds.add)return abrirRegistro(ds.add);
+  if(ds.edit)return abrirRegistro(ds.edit,ds.id);
+  if(ds.gen)return generar(ds.gen);
+  if(ds.ver)return verDoc(ds.ver);
+  if(ds.switch)return cambiarPerfil(ds.switch);
+  if(ds.editperfil)return abrirPerfil(ds.editperfil);
+  if(ds.copy){const x=D().documentos.find(d=>d.id===ds.copy);try{await navigator.clipboard.writeText(x.texto);toast("Texto copiado.")}catch(e){toast("No se pudo copiar. Selecciona el texto manualmente.")}return}
+  if(ds.dldoc){const x=D().documentos.find(d=>d.id===ds.dldoc);try{await DL.save({filename:`${x.nombre} - ${E().razon||""}.txt`,data:x.texto})}catch(e){if(!e||e.code!=="declined")toast("No se pudo descargar.")}return}
+  if(ds.deldoc){D().documentos=D().documentos.filter(x=>x.id!==ds.deldoc);saveD();closeSheet();return render()}
+  switch(ds.act){
+    case "close":return closeSheet();
+    case "perfiles":return abrirPerfiles();
+    case "nuevaempresa":closeSheet();P.activo=null;NEW={emp:{},data:blankData()};NEW.data.paso=0;tab="encuesta";return render();
+    case "reiniciar":{if(b.dataset.c!=="1"){b.dataset.c="1";b.textContent="Toca de nuevo para borrar las respuestas";return}const d=D();d.enc={};d.hechas={};d.resumen="";d.paso=0;saveD();return render()}
+    case "exportar":{const data=JSON.stringify({app:"pyme-en-regla",version:1,fecha:new Date().toISOString(),perfiles:P,datos:DATA});
+      try{await DL.save({filename:`Respaldo Pyme en Regla ${iso()}.json`,data});toast("Copia de seguridad lista.")}catch(e){if(!e||e.code!=="declined")toast("No se pudo crear la copia.")}return}
+    case "importar":{document.getElementById("impfile").click();return}
+    case "borrartodo":{if(b.dataset.c!=="1"){b.dataset.c="1";b.textContent="Toca de nuevo para borrar todo definitivamente";return}
+      for(const pf of P.perfiles){const d=DATA[pf.id];if(d&&ASSETS)for(const k in d.brechas){for(const r of (d.brechas[k].respaldos||[]))if(r.assetId){try{await ASSETS.delete(r.assetId)}catch(e){}}}borrarDoc("enc_"+pf.id)}
+      borrarDoc("perfiles");try{await IDB.clear()}catch(e){}P={perfiles:[],activo:null};DATA={};NEW=null;closeSheet();go("encuesta");toast("Se eliminaron todos tus datos.");return}
+    case "pdf":return pdf();
+    case "pdfestado":return pdfEstado();
+    case "notaresp":return notaRespaldo(ctx.id);
+    case "resumen":return resumenIA();
+    case "preguntar":return preguntar();
+    case "del":{if(b.dataset.c!=="1"){b.dataset.c="1";b.textContent="Toca de nuevo para confirmar";return}D()[ctx.k]=D()[ctx.k].filter(x=>x.id!==ctx.id);saveD();closeSheet();return render()}
+    case "delperfil":{if(b.dataset.c!=="1"){b.dataset.c="1";b.textContent="Toca de nuevo para eliminar la empresa";return}const id=ctx.id;P.perfiles=P.perfiles.filter(x=>x.id!==id);delete DATA[id];borrarDoc("enc_"+id);return cambiarPerfil(P.perfiles[0].id)}
+  }
+});
+
+document.getElementById("impfile").addEventListener("change",async ev=>{
+  const f=ev.target.files&&ev.target.files[0];ev.target.value="";if(!f)return;
+  try{const j=JSON.parse(await f.text());if(j.app!=="pyme-en-regla"||!j.perfiles||!j.datos)throw 0;
+    P=j.perfiles;DATA={};for(const k in j.datos)DATA[k]=Object.assign(blankData(),j.datos[k]);saveP();for(const pf of P.perfiles){if(DATA[pf.id])setDoc("enc_"+pf.id,DATA[pf.id])}
+    closeSheet();tab=D().paso>Q.length?"informe":"encuesta";render();toast("Copia restaurada.")}
+  catch(e){toast("El archivo no es una copia válida de Pyme en Regla.")}
+});
+if(NATIVE&&PL.App)PL.App.addListener("backButton",()=>{if(sheet.open)closeSheet();else if(tab!=="encuesta")go("encuesta");else PL.App.exitApp()});
+render();
+cargar();
+</script>
+</body>
+</html>
